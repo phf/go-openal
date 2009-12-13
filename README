@@ -1,7 +1,10 @@
-There's not nearly enough to actually play
-or record audio, but I hope there will be
-in a week or so. I am trying to do follow
-the ideas from my SQLite binding: write a
-low-level core.go cgo API and then build a
-more Go-like API on top of that. We'll see
-how that works out. :-D
+There's not nearly enough here to actually play or record
+audio, but I hope there will be in a week or so.
+
+I am trying to follow the ideas from my SQLite binding: a
+low-level core.go cgo API to wrap away the C-level stuff,
+and a more Go-like API on top of that.
+
+If you have any OpenAL experience, please help! Just email
+and we can get going. I have no OpenAL experience myself,
+so I need all the help I can get. :-D
