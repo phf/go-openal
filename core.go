@@ -23,7 +23,13 @@ package openal
 //AL_API void AL_APIENTRY alGetSourcei( ALuint sid,  ALenum param, ALint* value );
 #include <AL/alc.h>
 //ALC_API ALCdevice *     ALC_APIENTRY alcOpenDevice( const ALCchar *devicename );
+ALCdevice *walcOpenDevice(const char *devicename) {
+	return alcOpenDevice(devicename);
+}
 //ALC_API ALCboolean      ALC_APIENTRY alcCloseDevice( ALCdevice *device );
+int walcCloseDevice(ALCdevice *device) {
+	return alcCloseDevice(device);
+}
 //ALC_API ALCenum         ALC_APIENTRY alcGetError( ALCdevice *device );
 //ALC_API ALCcontext *    ALC_APIENTRY alcCreateContext( ALCdevice *device, const ALCint* attrlist );
 //ALC_API ALCboolean      ALC_APIENTRY alcMakeContextCurrent( ALCcontext *context );
@@ -40,12 +46,27 @@ package openal
 import "C"
 
 import (
-	"fmt";
 	"unsafe";
 )
 
-func X() unsafe.Pointer {
-	fmt.Println("Argh");
-	C.free(nil);
-	return nil;
+type Device struct {
+	handle *C.ALCdevice;
+}
+
+func OpenDevice(name string) *Device {
+	p := C.CString(name);
+	h := C.walcOpenDevice(p);
+	C.free(unsafe.Pointer(p));
+
+	if h == nil {
+		return nil;
+	}
+
+	d := new(Device);
+	d.handle = h;
+	return d;
+}
+
+func CloseDevice(device *Device) bool {
+	return C.walcCloseDevice(device.handle) != 0;
 }

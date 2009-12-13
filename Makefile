@@ -6,14 +6,14 @@ include $(GOROOT)/src/Make.$(GOARCH)
 TARG=openal
 CGOFILES=core.go
 #GOFILES=error.go util.go
-#CGO_LDFLAGS=-lsqlite3
-#CLEANFILES+=example test.db
+CGO_LDFLAGS=-lopenal
+CLEANFILES+=example
 
 include $(GOROOT)/src/Make.pkg
 
-#example: install test.db example.go
-#	$(GC) example.go
-#	$(LD) -o $@ example.$O
+example: install example.go
+	$(GC) example.go
+	$(LD) -o $@ example.$O
 
 #test.db:
 #	sqlite3 test.db <create_db.sql
