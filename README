@@ -1,1 +1,7 @@
-Experimental. And nowhere near done.
+There's not nearly enough to actually play
+or record audio, but I hope there will be
+in a week or so. I am trying to do follow
+the ideas from my SQLite binding: write a
+low-level core.go cgo API and then build a
+more Go-like API on top of that. We'll see
+how that works out. :-D
