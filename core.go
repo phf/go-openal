@@ -13,18 +13,36 @@ package openal
 #include <AL/al.h>
 
 //AL_API void AL_APIENTRY alGenSources( ALsizei n, ALuint* sources );
+int walGenSource(void) {
+	ALuint source;
+	alGenSources(1, &source);
+	return source;
+}
 //AL_API void AL_APIENTRY alDeleteSources( ALsizei n, const ALuint* sources );
 //AL_API void AL_APIENTRY alGenBuffers( ALsizei n, ALuint* buffers );
 //AL_API void AL_APIENTRY alDeleteBuffers( ALsizei n, const ALuint* buffers );
 //AL_API void AL_APIENTRY alBufferData( ALuint bid, ALenum format, const ALvoid* data, ALsizei size, ALsizei freq );
-//AL_API void AL_APIENTRY alSourcePlay( ALuint sid );
-//AL_API void AL_APIENTRY alSourceStop( ALuint sid );
-//AL_API void AL_APIENTRY alSourceRewind( ALuint sid );
-//AL_API void AL_APIENTRY alSourcePause( ALuint sid );
+void walSourcePlay(int sid) {
+	alSourcePlay(sid);
+}
+void walSourceStop(int sid) {
+	alSourceStop(sid);
+}
+void walSourceRewind(int sid) {
+	alSourceRewind(sid);
+}
+void walSourcePause(int sid) {
+	alSourceRewind(sid);
+}
 //AL_API void AL_APIENTRY alSourceQueueBuffers( ALuint sid, ALsizei numEntries, const ALuint *bids );
 //AL_API void AL_APIENTRY alSourceUnqueueBuffers( ALuint sid, ALsizei numEntries, ALuint *bids );
-//AL_API ALenum AL_APIENTRY alGetError( void );
-//AL_API void AL_APIENTRY alSourcei( ALuint sid, ALenum param, ALint value );
+
+int walGetError(void) {
+	return alGetError();
+}
+void walSourcei(int sid, int param, int value) {
+	alSourcei(sid, param, value);
+}
 //AL_API void AL_APIENTRY alGetSourcei( ALuint sid,  ALenum param, ALint* value );
 
 #include <AL/alc.h>
@@ -144,8 +162,13 @@ const (
 )
 
 const (
+	AlBuffer = 0x1009;
+)
+
+const (
 	AlcCaptureSamples = 0x312;
 )
+
 
 type Device struct {
 	handle *C.ALCdevice;
@@ -186,6 +209,7 @@ func (self *Device) CreateContext() (context *Context) {
 	return;
 }
 
+
 type CaptureDevice struct {
 	handle *C.ALCdevice;
 }
@@ -225,10 +249,12 @@ func (self *CaptureDevice) GetInteger(param int) int {
 }
 
 func (self *CaptureDevice) CaptureSamples(size int) []byte {
+	// TODO: iffy iffy iffy :-D
 	var buffer [16*1024]byte;
 	C.walcCaptureSamples(self.handle, unsafe.Pointer(&buffer), C.int(size));
 	return buffer[0:];
 }
+
 
 type Context struct {
 	handle *C.ALCcontext;
@@ -244,5 +270,44 @@ func (self *Context) DestroyContext() {
 	// XXX: there used to be a alcDestroyContext() that
 	// returned something, but our alc.h doesn't list
 	// that one... Hmmm...
-
 }
+
+func Init() {
+	C.walutInit();
+}
+
+func Exit() {
+	C.walutExit();
+}
+
+
+type Buffer struct {
+	handle C.int;
+}
+
+func CreateBufferHelloWorld() (buffer *Buffer) {
+	buffer = new(Buffer);
+	buffer.handle = C.walutCreateBufferHelloWorld();
+	return;
+}
+
+
+type Source struct {
+	handle C.int;
+}
+
+func GenSource() (source *Source) {
+	source = new(Source);
+	source.handle = C.walGenSource();
+	return source;
+}
+
+// TODO: can't pass buffer really...
+func (self *Source) SetAttr(param int, value *Buffer) {
+	C.walSourcei(self.handle, C.int(param), value.handle);
+}
+
+func (self *Source) Play() {
+	C.walSourcePlay(self.handle);
+}
+
