@@ -78,7 +78,44 @@ int walcGetInteger(ALCdevice *device, int param) {
 }
 
 //#include <AL/alext.h>
-//#include <AL/alut.h>
+#include <AL/alut.h>
+
+// TODO: alutInit(int *argcp, char **argv)
+int walutInit(void) {
+	return alutInit(NULL, NULL);
+}
+
+int walutExit(void) {
+	return alutExit();
+}
+
+int walutGetError(void) {
+	return alutGetError();
+}
+
+const char *walutGetErrorString(int error) {
+	return alutGetErrorString(error);
+}
+
+//ALUT_API ALuint ALUT_APIENTRY alutCreateBufferFromFile (const char *fileName);
+//ALUT_API ALuint ALUT_APIENTRY alutCreateBufferFromFileImage (const ALvoid *data, ALsizei length);
+//ALUT_API ALuint ALUT_APIENTRY alutCreateBufferHelloWorld (void);
+int walutCreateBufferHelloWorld(void) {
+	return alutCreateBufferHelloWorld();
+}
+//ALUT_API ALuint ALUT_APIENTRY alutCreateBufferWaveform (ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration);
+
+//ALUT_API ALvoid *ALUT_APIENTRY alutLoadMemoryFromFile (const char *fileName, ALenum *format, ALsizei *size, ALfloat *frequency);
+//ALUT_API ALvoid *ALUT_APIENTRY alutLoadMemoryFromFileImage (const ALvoid *data, ALsizei length, ALenum *format, ALsizei *size, ALfloat *frequency);
+//ALUT_API ALvoid *ALUT_APIENTRY alutLoadMemoryHelloWorld (ALenum *format, ALsizei *size, ALfloat *frequency);
+//ALUT_API ALvoid *ALUT_APIENTRY alutLoadMemoryWaveform (ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration, ALenum *format, ALsizei *size, ALfloat *freq);
+
+//ALUT_API const char *ALUT_APIENTRY alutGetMIMETypes (ALenum loader);
+
+//ALUT_API ALint ALUT_APIENTRY alutGetMajorVersion (void);
+//ALUT_API ALint ALUT_APIENTRY alutGetMinorVersion (void);
+
+//ALUT_API ALboolean ALUT_APIENTRY alutSleep (ALfloat duration);
 */
 import "C"
 import "unsafe"
