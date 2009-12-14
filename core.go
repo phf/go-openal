@@ -8,7 +8,9 @@ package openal
 #include <stdlib.h>
 
 // It's sad but the OpenAL C API uses lots and lots of typedefs
-// that require wrapper function to make things work with cgo.
+// that require wrapper functions (using basic C types) for cgo
+// to grok them. So there's a lot more C code here than I would
+// like...
 
 #include <AL/al.h>
 
@@ -28,26 +30,11 @@ int walGenSource(void) {
 //AL_API void AL_APIENTRY alGenBuffers( ALsizei n, ALuint* buffers );
 //AL_API void AL_APIENTRY alDeleteBuffers( ALsizei n, const ALuint* buffers );
 //AL_API void AL_APIENTRY alBufferData( ALuint bid, ALenum format, const ALvoid* data, ALsizei size, ALsizei freq );
-void walSourcePlay(int sid) {
-	alSourcePlay(sid);
-}
-void walSourceStop(int sid) {
-	alSourceStop(sid);
-}
-void walSourceRewind(int sid) {
-	alSourceRewind(sid);
-}
-void walSourcePause(int sid) {
-	alSourceRewind(sid);
-}
 //AL_API void AL_APIENTRY alSourceQueueBuffers( ALuint sid, ALsizei numEntries, const ALuint *bids );
 //AL_API void AL_APIENTRY alSourceUnqueueBuffers( ALuint sid, ALsizei numEntries, ALuint *bids );
 
 int walGetError(void) {
 	return alGetError();
-}
-void walSourcei(int sid, int param, int value) {
-	alSourcei(sid, param, value);
 }
 //AL_API void AL_APIENTRY alGetSourcei( ALuint sid,  ALenum param, ALint* value );
 
@@ -121,13 +108,7 @@ const char *walutGetErrorString(int error) {
 	return alutGetErrorString(error);
 }
 
-int walutCreateBufferFromFile(const char *fileName) {
-	return alutCreateBufferFromFile(fileName);
-}
 //ALUT_API ALuint ALUT_APIENTRY alutCreateBufferFromFileImage (const ALvoid *data, ALsizei length);
-int walutCreateBufferHelloWorld(void) {
-	return alutCreateBufferHelloWorld();
-}
 //ALUT_API ALuint ALUT_APIENTRY alutCreateBufferWaveform (ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration);
 
 //ALUT_API ALvoid *ALUT_APIENTRY alutLoadMemoryFromFile (const char *fileName, ALenum *format, ALsizei *size, ALfloat *frequency);
@@ -287,18 +268,18 @@ func Exit() {
 
 
 type Buffer struct {
-	handle C.int;
+	handle C.ALuint;
 }
 
 func CreateBufferHelloWorld() (buffer *Buffer) {
 	buffer = new(Buffer);
-	buffer.handle = C.walutCreateBufferHelloWorld();
+	buffer.handle = C.alutCreateBufferHelloWorld();
 	return;
 }
 
 func CreateBufferFromFile(name string) (buffer *Buffer) {
 	p := C.CString(name);
-	h := C.walutCreateBufferFromFile(p);
+	h := C.alutCreateBufferFromFile(p);
 	C.free(unsafe.Pointer(p));
 
 	// TODO
@@ -313,13 +294,16 @@ func CreateBufferFromFile(name string) (buffer *Buffer) {
 }
 
 
+
+
+
 type Source struct {
-	handle C.int;
+	handle C.ALuint;
 }
 
 func GenSource() (source *Source) {
 	source = new(Source);
-	source.handle = C.walGenSource();
+	source.handle = C.ALuint(C.walGenSource());
 	return source;
 }
 
@@ -330,10 +314,21 @@ func GenSources(sources []uint) {
 
 // TODO: can't pass buffer really...
 func (self *Source) SetAttr(param int, value *Buffer) {
-	C.walSourcei(self.handle, C.int(param), value.handle);
+	C.alSourcei(self.handle, C.ALenum(param), C.ALint(value.handle));
 }
 
 func (self *Source) Play() {
-	C.walSourcePlay(self.handle);
+	C.alSourcePlay(self.handle);
 }
 
+func (self *Source) Stop() {
+	C.alSourceStop(self.handle);
+}
+
+func (self *Source) Rewind() {
+	C.alSourceRewind(self.handle);
+}
+
+func (self *Source) Pause() {
+	C.alSourcePause(self.handle);
+}
