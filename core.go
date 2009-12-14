@@ -41,9 +41,21 @@ int walcGetError(ALCdevice *device) {
 	return alcGetError(device);
 }
 
-//ALC_API ALCcontext *    ALC_APIENTRY alcCreateContext( ALCdevice *device, const ALCint* attrlist );
-//ALC_API ALCboolean      ALC_APIENTRY alcMakeContextCurrent( ALCcontext *context );
-//ALC_API void            ALC_APIENTRY alcDestroyContext( ALCcontext *context );
+// Example for attrlist setup from, ALC_INVALID terminates
+// http://www.fifi.org/cgi-bin/info2www?%28openal%29alc 
+// int attrlist[] = { ALC_SYNC, AL_TRUE,
+// ALC_SOURCES, 100,
+// ALC_FREQUENCY, 44100,
+// ALC_INVALID };
+// ALCdevice *dev = alcOpenDevice( NULL );
+// void *context = alcCreateContext( dev, attrlist );
+ALCcontext* walcCreateContext(ALCdevice *device, const int* attrlist) {
+	return alcCreateContext(device, attrlist);
+}
+
+int walcMakeContextCurrent(ALCcontext *context) {
+	return alcMakeContextCurrent(context);
+}
 
 ALCdevice *walcCaptureOpenDevice(const char *devicename, int frequency, int format, int buffersize) {
 	return alcCaptureOpenDevice(devicename, frequency, format, buffersize);
@@ -55,7 +67,6 @@ int walcCaptureCloseDevice(ALCdevice *device) {
 
 // Silly! You ask for the number of samples, but depending on the format
 // you're recording in there can be 1-4 bytes per sample!
-
 void walcCaptureSamples(ALCdevice *device, void *buffer, int samples) {
 	alcCaptureSamples(device, buffer, samples);
 }
@@ -125,6 +136,19 @@ func (self *Device) GetError() int {
 	return int(C.walcGetError(self.handle));
 }
 
+func (self *Device) CreateContext() (context *Context) {
+	// TODO: attrlist support
+	h := C.walcCreateContext(self.handle, nil);
+
+	if h == nil {
+		return;
+	}
+
+	context = new(Context);
+	context.handle = h;
+	return;
+}
+
 type CaptureDevice struct {
 	handle *C.ALCdevice;
 }
@@ -167,4 +191,21 @@ func (self *CaptureDevice) CaptureSamples(size int) []byte {
 	var buffer [16*1024]byte;
 	C.walcCaptureSamples(self.handle, unsafe.Pointer(&buffer), C.int(size));
 	return buffer[0:];
+}
+
+type Context struct {
+	handle *C.ALCcontext;
+}
+
+func (self *Context) MakeContextCurrent() bool {
+	return C.walcMakeContextCurrent(self.handle) != 0;
+}
+
+func (self *Context) DestroyContext() {
+	C.alcDestroyContext(self.handle);
+	self.handle = nil;
+	// XXX: there used to be a alcDestroyContext() that
+	// returned something, but our alc.h doesn't list
+	// that one... Hmmm...
+
 }

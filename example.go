@@ -11,8 +11,28 @@ func main() {
 	err := dev.GetError();
 	fmt.Printf("err: %s\n", err);
 
-	ok := dev.CloseDevice();
-	fmt.Printf("ok: %s\n", ok);
+	con := dev.CreateContext();
+	fmt.Printf("con: %s\n", con);
+
+	err = dev.GetError();
+	fmt.Printf("err: %s\n", err);
+
+	ok := con.MakeContextCurrent();
+	fmt.Printf("MakeContextCurrent ok: %s\n", ok);
+
+	con.DestroyContext();
+	fmt.Println("Context destroyed!");
+
+	// according to the OpenAL 1.1 spec this should have
+	// resulted in an error; hmmm...
+	err = dev.GetError();
+	fmt.Printf("err: %s\n", err);
+
+	ok = dev.CloseDevice();
+	fmt.Printf("CloseDevice ok: %s\n", ok);
+
+
+
 
 	mic := openal.CaptureOpenDevice("", 8000, openal.AlFormatMono16, 16000);
 	fmt.Printf("mic: %s\n", mic);
