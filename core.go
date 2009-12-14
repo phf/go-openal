@@ -58,6 +58,12 @@ int walcCaptureCloseDevice(ALCdevice *device) {
 //ALC_API void            ALC_APIENTRY alcCaptureSamples( ALCdevice *device, ALCvoid *buffer, ALCsizei samples );
 //ALC_API void            ALC_APIENTRY alcGetIntegerv( ALCdevice *device, ALCenum param, ALCsizei size, ALCint *data );
 
+int walcGetInteger(ALCdevice *device, int param) {
+	int result;
+	alcGetIntegerv(device, param, sizeof(result), &result);
+	return result;
+}
+
 //#include <AL/alext.h>
 //#include <AL/alut.h>
 */
@@ -85,6 +91,10 @@ const (
 	AlFormatMono16 = 0x1101;
 	AlFormatStereo8 = 0x1102;
 	AlFormatStereo16 = 0x1103;
+)
+
+const (
+	AlcCaptureSamples = 0x312;
 )
 
 type Device struct {
@@ -139,3 +149,14 @@ func (self *CaptureDevice) GetError() int {
 	return int(C.walcGetError(self.handle));
 }
 
+func (self *CaptureDevice) CaptureStart() {
+	C.alcCaptureStart(self.handle);
+}
+
+func (self *CaptureDevice) CaptureStop() {
+	C.alcCaptureStop(self.handle);
+}
+
+func (self *CaptureDevice) GetInteger(param int) int {
+	return int(C.walcGetInteger(self.handle, C.int(param)));
+}
