@@ -13,11 +13,17 @@ package openal
 #include <AL/al.h>
 
 //AL_API void AL_APIENTRY alGenSources( ALsizei n, ALuint* sources );
+
+void walGenSources(int n, void *sources) {
+	alGenSources(n, sources);
+}
+
 int walGenSource(void) {
 	ALuint source;
 	alGenSources(1, &source);
 	return source;
 }
+
 //AL_API void AL_APIENTRY alDeleteSources( ALsizei n, const ALuint* sources );
 //AL_API void AL_APIENTRY alGenBuffers( ALsizei n, ALuint* buffers );
 //AL_API void AL_APIENTRY alDeleteBuffers( ALsizei n, const ALuint* buffers );
@@ -115,9 +121,10 @@ const char *walutGetErrorString(int error) {
 	return alutGetErrorString(error);
 }
 
-//ALUT_API ALuint ALUT_APIENTRY alutCreateBufferFromFile (const char *fileName);
+int walutCreateBufferFromFile(const char *fileName) {
+	return alutCreateBufferFromFile(fileName);
+}
 //ALUT_API ALuint ALUT_APIENTRY alutCreateBufferFromFileImage (const ALvoid *data, ALsizei length);
-//ALUT_API ALuint ALUT_APIENTRY alutCreateBufferHelloWorld (void);
 int walutCreateBufferHelloWorld(void) {
 	return alutCreateBufferHelloWorld();
 }
@@ -132,8 +139,6 @@ int walutCreateBufferHelloWorld(void) {
 
 //ALUT_API ALint ALUT_APIENTRY alutGetMajorVersion (void);
 //ALUT_API ALint ALUT_APIENTRY alutGetMinorVersion (void);
-
-//ALUT_API ALboolean ALUT_APIENTRY alutSleep (ALfloat duration);
 */
 import "C"
 import "unsafe"
@@ -291,6 +296,22 @@ func CreateBufferHelloWorld() (buffer *Buffer) {
 	return;
 }
 
+func CreateBufferFromFile(name string) (buffer *Buffer) {
+	p := C.CString(name);
+	h := C.walutCreateBufferFromFile(p);
+	C.free(unsafe.Pointer(p));
+
+	// TODO
+
+	if h == 0 {
+		return;
+	}
+
+	buffer = new(Buffer);
+	buffer.handle = h;
+	return;
+}
+
 
 type Source struct {
 	handle C.int;
@@ -300,6 +321,11 @@ func GenSource() (source *Source) {
 	source = new(Source);
 	source.handle = C.walGenSource();
 	return source;
+}
+
+func GenSources(sources []uint) {
+	n := len(sources);
+	C.walGenSources(C.int(n), unsafe.Pointer(&sources[0]));
 }
 
 // TODO: can't pass buffer really...
