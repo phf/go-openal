@@ -17,5 +17,11 @@ func main() {
 	fmt.Println(someSources);
 	openal.GenSources(someSources);
 	fmt.Println(someSources);
+	// just to test GenBuffers
+	buffers := openal.GenBuffers(7);
+	fmt.Println(buffers);
+	openal.DumpRegistries();
+	openal.DeleteBuffers(buffers);
+	openal.DumpRegistries();
 	openal.Exit();
 }

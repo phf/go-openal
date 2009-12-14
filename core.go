@@ -14,21 +14,43 @@ package openal
 
 #include <AL/al.h>
 
-//AL_API void AL_APIENTRY alGenSources( ALsizei n, ALuint* sources );
+// For convenience we offer "singular" versions of the following
+// calls as well, which require different wrappers if we want to
+// be efficient. The main reason for "singular" versions is that
+// Go doesn't allow us to treat a variable as an array.
 
-void walGenSources(int n, void *sources) {
+void walGenSources(ALsizei n, void *sources) {
 	alGenSources(n, sources);
 }
-
-int walGenSource(void) {
+ALuint walGenSource(void) {
 	ALuint source;
 	alGenSources(1, &source);
 	return source;
 }
 
-//AL_API void AL_APIENTRY alDeleteSources( ALsizei n, const ALuint* sources );
-//AL_API void AL_APIENTRY alGenBuffers( ALsizei n, ALuint* buffers );
-//AL_API void AL_APIENTRY alDeleteBuffers( ALsizei n, const ALuint* buffers );
+void walDeleteSources(ALsizei n, const void *sources) {
+	alDeleteSources(n, sources);
+}
+void walDeleteSource(ALuint source) {
+	alDeleteSources(1, &source);
+}
+
+void walGenBuffers(ALsizei n, void *buffers) {
+	alGenBuffers(n, buffers);
+}
+ALuint walGenBuffer(void) {
+	ALuint buffer;
+	alGenBuffers(1, &buffer);
+	return buffer;
+}
+
+void walDeleteBuffers(ALsizei n, const void *buffers) {
+	alDeleteBuffers(n, buffers);
+}
+void walDeleteBuffer(ALuint buffer) {
+	alDeleteBuffers(1, &buffer);
+}
+
 //AL_API void AL_APIENTRY alBufferData( ALuint bid, ALenum format, const ALvoid* data, ALsizei size, ALsizei freq );
 //AL_API void AL_APIENTRY alSourceQueueBuffers( ALuint sid, ALsizei numEntries, const ALuint *bids );
 //AL_API void AL_APIENTRY alSourceUnqueueBuffers( ALuint sid, ALsizei numEntries, ALuint *bids );
@@ -124,6 +146,8 @@ const char *walutGetErrorString(int error) {
 import "C"
 import "unsafe"
 
+import "fmt"
+
 // All of the following are eventually going to be
 // private to the Go OpenAL binding. For now I am
 // just playing around, so they are public. Not for
@@ -137,6 +161,47 @@ const (
 	AlcInvalidEnum = 0xA003;
 	AlcInvalidValue = 0xA004;
 	AlcOutOfMemory = 0xA005;
+)
+
+// what GetError returns
+const (
+	AlNoError = 0;
+	AlInvalidName = 0xA001;
+	AlInvalidEnum = 0xA002;
+	AlInvalidValue = 0xA003;
+	AlInvalidOperation = 0xA004;
+)
+
+// what alutGetError returns
+const (
+	AlutErrorNoError = 0;
+	AlutErrorOutOfMemory = 0x200;
+	AlutErrorInvalidEnum = 0x201;
+//#define ALUT_ERROR_INVALID_VALUE               0x202
+//#define ALUT_ERROR_INVALID_OPERATION           0x203
+//#define ALUT_ERROR_NO_CURRENT_CONTEXT          0x204
+//#define ALUT_ERROR_AL_ERROR_ON_ENTRY           0x205
+//#define ALUT_ERROR_ALC_ERROR_ON_ENTRY          0x206
+//#define ALUT_ERROR_OPEN_DEVICE                 0x207
+//#define ALUT_ERROR_CLOSE_DEVICE                0x208
+//#define ALUT_ERROR_CREATE_CONTEXT              0x209
+//#define ALUT_ERROR_MAKE_CONTEXT_CURRENT        0x20A
+//#define ALUT_ERROR_DESTROY_CONTEXT             0x20B
+//#define ALUT_ERROR_GEN_BUFFERS                 0x20C
+//#define ALUT_ERROR_BUFFER_DATA                 0x20D
+//#define ALUT_ERROR_IO_ERROR                    0x20E
+//#define ALUT_ERROR_UNSUPPORTED_FILE_TYPE       0x20F
+//#define ALUT_ERROR_UNSUPPORTED_FILE_SUBTYPE    0x210
+//#define ALUT_ERROR_CORRUPT_OR_TRUNCATED_DATA   0x211
+)
+
+// waveform for alutSomething
+const (
+	AlutWaveformSine = 0x100;
+	AlutWaveformSquare = 0x101;
+	AlutWaveformSawtooth = 0x102;
+	AlutWaveformWhitenoise = 0x103;
+	AlutWaveformImpulse = 0x104;
 )
 
 // format for CaptureOpenDevice
@@ -154,6 +219,7 @@ const (
 const (
 	AlcCaptureSamples = 0x312;
 )
+
 
 
 type Device struct {
@@ -267,13 +333,109 @@ func Exit() {
 }
 
 
+
+func GetError() int {
+	return int(C.walGetError());
+}
+
+func AlutGetError() int {
+	return int(C.walutGetError());
+}
+
+
+// We maintain these to make results that return lists
+// of OpenAL object names intelligible to the Go side.
+
+var bufferRegistry map[C.ALuint]*Buffer = make(map[C.ALuint]*Buffer);
+var sourceRegistry map[C.ALuint]*Source = make(map[C.ALuint]*Source);
+
+func rememberBuffer(buffer *Buffer) {
+	bufferRegistry[buffer.handle] = buffer;
+}
+func forgetBuffer(buffer *Buffer) {
+	bufferRegistry[buffer.handle] = buffer, false;
+}
+func rememberSource(source *Source) {
+	sourceRegistry[source.handle] = source;
+}
+func forgetSource(source *Source) {
+	sourceRegistry[source.handle] = source, false;
+}
+func DumpRegistries() {
+	fmt.Println("========");
+	for _, v := range bufferRegistry {
+		fmt.Printf("%s\n", v);
+	}
+	for _, v := range sourceRegistry {
+		fmt.Printf("%s\n", v);
+	}
+}
+
+// OpenAL Buffers
+
 type Buffer struct {
 	handle C.ALuint;
 }
 
-func CreateBufferHelloWorld() (buffer *Buffer) {
+func GenBuffers(n int) (buffers []*Buffer) {
+	bufferIds := make([]C.ALuint, n);
+	C.walGenBuffers(C.ALsizei(n), unsafe.Pointer(&bufferIds[0]));
+
+	if GetError() != AlNoError {
+		return;
+	}
+
+	buffers = make([]*Buffer, n);
+	for i, v := range bufferIds {
+		b := new(Buffer);
+		b.handle = v;
+		rememberBuffer(b);
+		buffers[i] = b;
+	}
+	return;
+}
+
+func GenBuffer() (buffer *Buffer) {
+	h := C.walGenBuffer();
+
+	if GetError() != AlNoError {
+		return;
+	}
+
 	buffer = new(Buffer);
-	buffer.handle = C.alutCreateBufferHelloWorld();
+	buffer.handle = h;
+	rememberBuffer(buffer);
+	return;
+}
+
+func DeleteBuffers(buffers []*Buffer) {
+	n := len(buffers);
+	bufferIds := make([]C.ALuint, n);
+
+	for i, v := range buffers {
+		forgetBuffer(v);
+		bufferIds[i] = v.handle;
+	}
+
+	C.walDeleteBuffers(C.ALsizei(n), unsafe.Pointer(&bufferIds[0]));
+	return;
+}
+
+func DeleteBuffer(buffer *Buffer) {
+	forgetBuffer(buffer);
+	C.walDeleteBuffer(buffer.handle);
+}
+
+func CreateBufferHelloWorld() (buffer *Buffer) {
+	h := C.alutCreateBufferHelloWorld();
+
+	if AlutGetError() != AlutErrorNoError {
+		return;
+	}
+
+	buffer = new(Buffer);
+	buffer.handle = h;
+	rememberBuffer(buffer);
 	return;
 }
 
@@ -282,20 +444,17 @@ func CreateBufferFromFile(name string) (buffer *Buffer) {
 	h := C.alutCreateBufferFromFile(p);
 	C.free(unsafe.Pointer(p));
 
-	// TODO
-
-	if h == 0 {
+	if AlutGetError() != AlutErrorNoError {
 		return;
 	}
 
 	buffer = new(Buffer);
 	buffer.handle = h;
+	rememberBuffer(buffer);
 	return;
 }
 
-
-
-
+// OpenAL Sources
 
 type Source struct {
 	handle C.ALuint;
@@ -309,7 +468,7 @@ func GenSource() (source *Source) {
 
 func GenSources(sources []uint) {
 	n := len(sources);
-	C.walGenSources(C.int(n), unsafe.Pointer(&sources[0]));
+	C.walGenSources(C.ALsizei(n), unsafe.Pointer(&sources[0]));
 }
 
 // TODO: can't pass buffer really...
