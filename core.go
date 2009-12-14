@@ -53,10 +53,12 @@ int walcCaptureCloseDevice(ALCdevice *device) {
 	return alcCaptureCloseDevice(device);
 }
 
-//ALC_API void            ALC_APIENTRY alcCaptureStart( ALCdevice *device );
-//ALC_API void            ALC_APIENTRY alcCaptureStop( ALCdevice *device );
-//ALC_API void            ALC_APIENTRY alcCaptureSamples( ALCdevice *device, ALCvoid *buffer, ALCsizei samples );
-//ALC_API void            ALC_APIENTRY alcGetIntegerv( ALCdevice *device, ALCenum param, ALCsizei size, ALCint *data );
+// Silly! You ask for the number of samples, but depending on the format
+// you're recording in there can be 1-4 bytes per sample!
+
+void walcCaptureSamples(ALCdevice *device, void *buffer, int samples) {
+	alcCaptureSamples(device, buffer, samples);
+}
 
 int walcGetInteger(ALCdevice *device, int param) {
 	int result;
@@ -159,4 +161,10 @@ func (self *CaptureDevice) CaptureStop() {
 
 func (self *CaptureDevice) GetInteger(param int) int {
 	return int(C.walcGetInteger(self.handle, C.int(param)));
+}
+
+func (self *CaptureDevice) CaptureSamples(size int) []byte {
+	var buffer [16*1024]byte;
+	C.walcCaptureSamples(self.handle, unsafe.Pointer(&buffer), C.int(size));
+	return buffer[0:];
 }

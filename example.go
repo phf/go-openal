@@ -14,8 +14,7 @@ func main() {
 	ok := dev.CloseDevice();
 	fmt.Printf("ok: %s\n", ok);
 
-
-	mic := openal.CaptureOpenDevice("", 8000, openal.AlFormatMono8, 16000);
+	mic := openal.CaptureOpenDevice("", 8000, openal.AlFormatMono16, 16000);
 	fmt.Printf("mic: %s\n", mic);
 
 	err = mic.GetError();
@@ -31,6 +30,9 @@ func main() {
 
 	smp := mic.GetInteger(openal.AlcCaptureSamples);
 	fmt.Printf("smp: %s\n", smp);
+
+	buf := mic.CaptureSamples(smp);
+	fmt.Printf("buf: %v\n", buf);
 
 	mic.CaptureStop();
 	fmt.Println("capture stopped!");
