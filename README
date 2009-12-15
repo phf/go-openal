@@ -6,6 +6,15 @@ I am trying to follow the ideas from my SQLite binding: a
 low-level core.go cgo API to wrap away the C-level stuff,
 and a more Go-like API on top of that.
 
+Actually, scratch that. I am now experimenting with a
+different approach, but I won't kill the stuff I did so
+far just yet: In the experiment, /pkg/openal will be the
+Go-level API while /pkg/openal/al[c|ut] will be exposed
+C-level APIs with minimal attempts at using Go the right
+way. I hope that this will allow hardcore hackers to go
+all the way to the bottom instead of being tied to what
+I think a Go-level API should look like. :-D
+
 If you have any OpenAL experience, please help! Just email
 and we can get going. I have no OpenAL experience myself,
 so I need all the help I can get. :-D
