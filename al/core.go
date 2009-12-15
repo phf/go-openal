@@ -2,8 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// This is a C-level binding for OpenAL's "al" API. Please
-// consider using the Go-level binding instead.
+// C-level binding for OpenAL's "al" API.
+//
+// Please consider using the Go-level binding instead.
 //
 // OpenAL types are (in principle) mapped to Go types as
 // follows:
