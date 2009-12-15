@@ -31,6 +31,13 @@
 //
 // Overall, the correspondence of types hopefully feels
 // natural enough.
+//
+// XXX: conflicts between constants and functions, for
+// example DistanceModel and DistanceModel() and how
+// they are resolved.
+//
+// TODO: write wrappers with better names around GetInteger()
+// and friends? for example GetDistanceModel()?
 package al
 
 /*
@@ -66,18 +73,46 @@ ALdouble alGetDouble( ALenum param );
 ALboolean alIsExtensionPresent( const ALchar* extname );
 void* alGetProcAddress( const ALchar* fname );
 ALenum alGetEnumValue( const ALchar* ename );
-void alListenerf( ALenum param, ALfloat value );
-void alListener3f( ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
-void alListenerfv( ALenum param, const ALfloat* values ); 
-void alListeneri( ALenum param, ALint value );
-void alListener3i( ALenum param, ALint value1, ALint value2, ALint value3 );
-void alListeneriv( ALenum param, const ALint* values );
-void alGetListenerf( ALenum param, ALfloat* value );
-void alGetListener3f( ALenum param, ALfloat *value1, ALfloat *value2, ALfloat *value3 );
-void alGetListenerfv( ALenum param, ALfloat* values );
-void alGetListeneri( ALenum param, ALint* value );
-void alGetListener3i( ALenum param, ALint *value1, ALint *value2, ALint *value3 );
-void alGetListeneriv( ALenum param, ALint* values );
+// void alListenerf( ALenum param, ALfloat value );
+// void alListener3f( ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
+// void alListenerfv( ALenum param, const ALfloat* values ); 
+void walListenerfv(ALenum param, const void* values) {
+	alListenerfv(param, values);
+}
+// void alListeneri( ALenum param, ALint value );
+// void alListener3i( ALenum param, ALint value1, ALint value2, ALint value3 );
+// void alListeneriv( ALenum param, const ALint* values );
+void walListeneriv(ALenum param, const void* values) {
+	alListeneriv(param, values);
+}
+// void alGetListenerf( ALenum param, ALfloat* value );
+ALfloat walGetListenerf(ALenum param) {
+	ALfloat result;
+	alGetListenerf(param, &result);
+	return result;
+}
+// void alGetListener3f( ALenum param, ALfloat *value1, ALfloat *value2, ALfloat *value3 );
+void walGetListener3f(ALenum param, void *value1, void *value2, void *value3) {
+	alGetListener3f(param, value1, value2, value3);
+}
+// void alGetListenerfv( ALenum param, ALfloat* values );
+void walGetListenerfv(ALenum param, void* values) {
+	alGetListenerfv(param, values);
+}
+// void alGetListeneri( ALenum param, ALint* value );
+ALint walGetListeneri(ALenum param) {
+	ALint result;
+	alGetListeneri(param, &result);
+	return result;
+}
+// void alGetListener3i( ALenum param, ALint *value1, ALint *value2, ALint *value3 );
+void walGetListener3i(ALenum param, void *value1, void *value2, void *value3) {
+	alGetListener3i(param, value1, value2, value3);
+}
+// void alGetListeneriv( ALenum param, ALint* values );
+void walGetListeneriv(ALenum param, void* values) {
+	alGetListeneriv(param, values);
+}
 //void alGenSources( ALsizei n, ALuint* sources ); 
 void walGenSources(ALsizei n, void *sources) {
 	alGenSources(n, sources);
@@ -118,7 +153,7 @@ void walDeleteBuffers(ALsizei n, const void *buffers) {
 	alDeleteBuffers(n, buffers);
 }
 // ALboolean alIsBuffer( ALuint bid );
-void alBufferData( ALuint bid, ALenum format, const ALvoid* data, ALsizei size, ALsizei freq );
+// void alBufferData( ALuint bid, ALenum format, const ALvoid* data, ALsizei size, ALsizei freq );
 void alBufferf( ALuint bid, ALenum param, ALfloat value );
 void alBuffer3f( ALuint bid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
 void alBufferfv( ALuint bid, ALenum param, const ALfloat* values );
@@ -131,10 +166,10 @@ void alGetBufferfv( ALuint bid, ALenum param, ALfloat* values );
 void alGetBufferi( ALuint bid, ALenum param, ALint* value );
 void alGetBuffer3i( ALuint bid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
 void alGetBufferiv( ALuint bid, ALenum param, ALint* values );
-void alDopplerFactor( ALfloat value );
-void alDopplerVelocity( ALfloat value );
-void alSpeedOfSound( ALfloat value );
-void alDistanceModel( ALenum distanceModel );
+// void alDopplerFactor( ALfloat value );
+// void alDopplerVelocity( ALfloat value );
+// void alSpeedOfSound( ALfloat value );
+// void alDistanceModel( ALenum distanceModel );
 
 // For convenience we offer "singular" versions of the following
 // calls as well, which require different wrappers if we want to
@@ -209,6 +244,37 @@ type Source uint32;
 // Buffers are storage space for sample data.
 type Buffer uint32;
 
+// Listener represents the singleton receiver of
+// sound in 3d space.
+//
+// We "fake" this type so we can provide OpenAL
+// listener calls as methods. This is convenient
+// and makes all those calls consistent with the
+// way they work for Source and Buffer. You can't
+// make new listeners, there's only one!
+type Listener struct{};
+
+// TODO: Get*() queries.
+const (
+	DistanceModel = 0xD000;
+)
+
+// Distance models passed to SetDistanceModel().
+const (
+	InverseDistance = 0xD001;
+	InverseDistanceClamped = 0xD002;
+	LinearDistance = 0xD003;
+	LinearDistanceClamped = 0xD004;
+	ExponentDistance = 0xD005;
+	ExponentDistanceClamped = 0xD006;
+)
+
+// SetDistanceModel() changes the current distance model.
+// This is just DistanceModel() in OpenAL.
+func SetDistanceModel(model uint32) {
+	C.alDistanceModel(C.ALenum(model));
+}
+
 // NOT DOCUMENTED YET
 
 func GetString(param uint32) string {
@@ -281,7 +347,86 @@ const (
 func (self Buffer) BufferData(format uint32, data []byte, size uint32, freq uint32) {
 	C.alBufferData(C.ALuint(self), C.ALenum(format), unsafe.Pointer(&data[0]),
 		C.ALsizei(size), C.ALsizei(freq));
+	// TODO: pass data as array or pointer?
 }
+
+
+
+func DopplerFactor (value float32) {
+	C.alDopplerFactor(C.ALfloat(value));
+}
+
+func DopplerVelocity (value float32) {
+	C.alDopplerVelocity(C.ALfloat(value));
+}
+
+func SpeedOfSound (value float32) {
+	C.alSpeedOfSound(C.ALfloat(value));
+}
+
+
+
+
+func (self Listener) Setf(param uint32, value float32) {
+	C.alListenerf(C.ALenum(param), C.ALfloat(value));
+}
+
+func (self Listener) Set3f(param uint32, value1, value2, value3 float32) {
+	C.alListener3f(C.ALenum(param), C.ALfloat(value1), C.ALfloat(value2), C.ALfloat(value3));
+}
+
+func (self Listener) Setfv(param uint32, values []float32) {
+	C.walListenerfv(C.ALenum(param), unsafe.Pointer(&values[0]));
+}
+
+func (self Listener) Seti(param uint32, value int32) {
+	C.alListeneri(C.ALenum(param), C.ALint(value));
+}
+
+func (self Listener) Set3i(param uint32, value1, value2, value3 int32) {
+	C.alListener3i(C.ALenum(param), C.ALint(value1), C.ALint(value2), C.ALint(value3));
+}
+
+func (self Listener) Setiv(param uint32, values []int32) {
+	C.walListeneriv(C.ALenum(param), unsafe.Pointer(&values[0]));
+}
+
+func (self Listener) Getf(param uint32) float32 {
+	return float32(C.walGetListenerf(C.ALenum(param)));
+}
+
+func (self Listener) Get3f(param uint32) (value1, value2, value3 float32) {
+	var v1, v2, v3 float32;
+	C.walGetListener3f(C.ALenum(param), unsafe.Pointer(&v1),
+		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
+	value1, value2, value3 = v1, v2, v3;
+	return;
+	// TODO: this the best way?
+}
+
+func (self Listener) Getfv(param uint32) (values []float32) {
+	C.walGetListenerfv(C.ALenum(param), unsafe.Pointer(&values[0]));
+	return;
+}
+
+func (self Listener) Geti(param uint32) int32 {
+	return int32(C.walGetListeneri(C.ALenum(param)));
+}
+
+func (self Listener) Get3i(param uint32) (value1, value2, value3 int32) {
+	var v1, v2, v3 int32;
+	C.walGetListener3i(C.ALenum(param), unsafe.Pointer(&v1),
+		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
+	value1, value2, value3 = v1, v2, v3;
+	return;
+	// TODO: this the best way?
+}
+
+func (self Listener) Getiv(param uint32) (values []int32) {
+	C.walGetListeneriv(C.ALenum(param), unsafe.Pointer(&values[0]));
+	return;
+}
+
 
 // NOT CLEANED UP YET
 
