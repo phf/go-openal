@@ -6,6 +6,11 @@
 //
 // Please consider using the Go-level binding instead.
 //
+// Note that "alc" introduces the exact same types as "al"
+// but with different names. Check the documentation of
+// openal/al for more information about the mapping to
+// Go types.
+//
 // XXX: Sadly we have to returns pointers for both Device
 // and Context to avoid problems with implicit assignments
 // in clients. It's sad because it makes the overhead a
@@ -52,10 +57,10 @@ void walcGetIntegerv(ALCdevice *device, ALCenum param, ALCsizei size, void *data
 ALCdevice *walcCaptureOpenDevice(const char *devicename, ALCuint frequency, ALCenum format, ALCsizei buffersize) {
 	return alcCaptureOpenDevice(devicename, frequency, format, buffersize);
 }
-ALCboolean alcCaptureCloseDevice( ALCdevice *device );
-void alcCaptureStart( ALCdevice *device );
-void alcCaptureStop( ALCdevice *device );
-void alcCaptureSamples( ALCdevice *device, ALCvoid *buffer, ALCsizei samples );
+// ALCboolean alcCaptureCloseDevice( ALCdevice *device );
+// void alcCaptureStart( ALCdevice *device );
+// void alcCaptureStop( ALCdevice *device );
+// void alcCaptureSamples( ALCdevice *device, ALCvoid *buffer, ALCsizei samples );
 
 // For convenience we offer "singular" versions of the following
 // calls as well, which require different wrappers if we want to
@@ -176,6 +181,9 @@ func CaptureOpenDevice(name string, freq uint32, format uint32, size uint32) *Ca
 	return &CaptureDevice{Device{h},s};
 }
 
+// XXX: Override Device.CloseDevice to make sure the correct
+// C function is called even if someone decides to use this
+// behind an interface.
 func (self *CaptureDevice) CloseDevice() bool {
 	return C.alcCaptureCloseDevice(self.handle) != 0;
 }
@@ -197,6 +205,8 @@ func (self *CaptureDevice) CaptureSamples(size uint32) (data []byte) {
 	C.alcCaptureSamples(self.handle, unsafe.Pointer(&data[0]), C.ALCsizei(size));
 	return;
 }
+
+
 
 type Context struct {
 	handle *C.ALCcontext;
