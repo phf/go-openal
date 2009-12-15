@@ -7,13 +7,13 @@ TARG=openal/al
 CGOFILES=core.go
 #GOFILES=error.go util.go
 CGO_LDFLAGS=-lopenal
-#CLEANFILES+=example hello hey
+CLEANFILES+=example
 
 include $(GOROOT)/src/Make.pkg
 
-#example: install example.go
-#	$(GC) example.go
-#	$(LD) -o $@ example.$O
+example: install example.go
+	$(GC) example.go
+	$(LD) -o $@ example.$O
 
 #hey: install hey.go
 #	$(GC) hey.go

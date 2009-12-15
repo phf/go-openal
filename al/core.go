@@ -270,16 +270,6 @@ func DeleteBuffer(buffer Buffer) {
 	C.walDeleteSource(C.ALuint(buffer));
 }
 
-func (self Buffer) BufferData(format uint32, data []byte, size uint32, freq uint32) {
-	C.alBufferData(C.ALuint(self), C.ALenum(format), unsafe.Pointer(&data[0]),
-		C.ALsizei(size), C.ALsizei(freq));
-}
-
-// NOT CLEANED UP YET
-
-
-
-// format
 const (
 	FormatMono8 = 0x1100;
 	FormatMono16 = 0x1101;
@@ -287,10 +277,13 @@ const (
 	FormatStereo16 = 0x1103;
 )
 
+func (self Buffer) BufferData(format uint32, data []byte, size uint32, freq uint32) {
+	C.alBufferData(C.ALuint(self), C.ALenum(format), unsafe.Pointer(&data[0]),
+		C.ALsizei(size), C.ALsizei(freq));
+}
+
+// NOT CLEANED UP YET
+
 const (
 	AlBuffer = 0x1009;
 )
-
-
-
-
