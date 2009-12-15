@@ -86,6 +86,12 @@ func (self Device) CloseDevice() bool {
 	return C.alcCloseDevice(self.handle) != 0;
 }
 
+func (self Device) CreateContext() Context {
+	// TODO: really a method?
+	// TODO: attrlist support
+	return Context{C.alcCreateContext(self.handle, nil)};
+}
+
 type CaptureDevice struct {
 	Device;
 }
@@ -105,4 +111,32 @@ func (self CaptureDevice) CloseDevice() bool {
 
 func (self CaptureDevice) CaptureCloseDevice() bool {
 	return self.CloseDevice();
+}
+
+func (self CaptureDevice) CaptureStart() {
+	C.alcCaptureStart(self.handle);
+}
+
+func (self CaptureDevice) CaptureStop() {
+	C.alcCaptureStop(self.handle);
+}
+
+
+
+type Context struct {
+	handle *C.ALCcontext;
+}
+
+
+
+func (self Context) MakeContextCurrent() bool {
+	return C.alcMakeContextCurrent(self.handle) != 0;
+}
+
+func (self Context) DestroyContext() {
+	C.alcDestroyContext(self.handle);
+	self.handle = nil;
+	// XXX: there used to be a alcDestroyContext() that
+	// returned something, but our alc.h doesn't list
+	// that one... Hmmm...
 }
