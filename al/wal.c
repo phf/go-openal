@@ -74,18 +74,46 @@ void walDeleteSources(ALsizei n, const void *sources) {
 	alDeleteSources(n, sources);
 }
 // ALboolean alIsSource( ALuint sid ); 
-void alSourcef( ALuint sid, ALenum param, ALfloat value ); 
-void alSource3f( ALuint sid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
-void alSourcefv( ALuint sid, ALenum param, const ALfloat* values ); 
-void alSourcei( ALuint sid, ALenum param, ALint value ); 
-void alSource3i( ALuint sid, ALenum param, ALint value1, ALint value2, ALint value3 );
-void alSourceiv( ALuint sid, ALenum param, const ALint* values );
-void alGetSourcef( ALuint sid, ALenum param, ALfloat* value );
-void alGetSource3f( ALuint sid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
-void alGetSourcefv( ALuint sid, ALenum param, ALfloat* values );
-void alGetSourcei( ALuint sid,  ALenum param, ALint* value );
-void alGetSource3i( ALuint sid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
-void alGetSourceiv( ALuint sid,  ALenum param, ALint* values );
+// void alSourcef( ALuint sid, ALenum param, ALfloat value ); 
+// void alSource3f( ALuint sid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
+// void alSourcefv( ALuint sid, ALenum param, const ALfloat* values ); 
+void walSourcefv(ALuint sid, ALenum param, const void* values) {
+	alSourcefv(sid, param, values);
+}
+// void alSourcei( ALuint sid, ALenum param, ALint value ); 
+// void alSource3i( ALuint sid, ALenum param, ALint value1, ALint value2, ALint value3 );
+// void alSourceiv( ALuint sid, ALenum param, const ALint* values );
+void walSourceiv(ALuint sid, ALenum param, const void* values) {
+	alSourceiv(sid, param, values);
+}
+// void alGetSourcef( ALuint sid, ALenum param, ALfloat* value );
+ALfloat walGetSourcef(ALuint sid, ALenum param) {
+	ALfloat result;
+	alGetSourcef(sid, param, &result);
+	return result;
+}
+// void alGetSource3f( ALuint sid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
+void walGetSource3f(ALuint sid, ALenum param, void *value1, void *value2, void *value3) {
+	alGetSource3f(sid, param, value1, value2, value3);
+}
+// void alGetSourcefv( ALuint sid, ALenum param, ALfloat* values );
+void walGetSourcefv(ALuint sid, ALenum param, void* values) {
+	alGetSourcefv(sid, param, values);
+}
+// void alGetSourcei( ALuint sid,  ALenum param, ALint* value );
+ALint walGetSourcei(ALuint sid, ALenum param) {
+	ALint result;
+	alGetSourcei(sid, param, &result);
+	return result;
+}
+// void alGetSource3i( ALuint sid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
+void walGetSource3i(ALuint sid, ALenum param, void *value1, void *value2, void *value3) {
+	alGetSource3i(sid, param, value1, value2, value3);
+}
+// void alGetSourceiv( ALuint sid,  ALenum param, ALint* values );
+void walGetSourceiv(ALuint sid, ALenum param, void* values) {
+	alGetSourceiv(sid, param, values);
+}
 void alSourcePlayv( ALsizei ns, const ALuint *sids );
 void alSourceStopv( ALsizei ns, const ALuint *sids );
 void alSourceRewindv( ALsizei ns, const ALuint *sids );
@@ -133,14 +161,17 @@ ALuint walGenSource(void) {
 	alGenSources(1, &source);
 	return source;
 }
+
 void walDeleteSource(ALuint source) {
 	alDeleteSources(1, &source);
 }
+
 ALuint walGenBuffer(void) {
 	ALuint buffer;
 	alGenBuffers(1, &buffer);
 	return buffer;
 }
+
 void walDeleteBuffer(ALuint buffer) {
 	alDeleteBuffers(1, &buffer);
 }
