@@ -37,7 +37,8 @@
 // they are resolved.
 //
 // TODO: write wrappers with better names around GetInteger()
-// and friends? for example GetDistanceModel()?
+// and friends? for example GetDistanceModel()? could go into
+// util.go or something, pure Go code
 package al
 
 /*
@@ -275,6 +276,22 @@ func SetDistanceModel(model uint32) {
 	C.alDistanceModel(C.ALenum(model));
 }
 
+// Format of sound samples passed to BufferData().
+const (
+	FormatMono8 = 0x1100;
+	FormatMono16 = 0x1101;
+	FormatStereo8 = 0x1102;
+	FormatStereo16 = 0x1103;
+)
+
+// BufferData() specifies the sample data the buffer should use.
+// Depending on the format, the data slice has to be a multiple
+// of two or four bytes long. The frequency is given in Hz.
+func (self Buffer) BufferData(format uint32, data []byte, frequency uint32) {
+	C.alBufferData(C.ALuint(self), C.ALenum(format), unsafe.Pointer(&data[0]),
+		C.ALsizei(len(data)), C.ALsizei(frequency));
+}
+
 // NOT DOCUMENTED YET
 
 func GetString(param uint32) string {
@@ -335,19 +352,6 @@ func DeleteBuffers(buffers []Buffer) {
 
 func DeleteBuffer(buffer Buffer) {
 	C.walDeleteSource(C.ALuint(buffer));
-}
-
-const (
-	FormatMono8 = 0x1100;
-	FormatMono16 = 0x1101;
-	FormatStereo8 = 0x1102;
-	FormatStereo16 = 0x1103;
-)
-
-func (self Buffer) BufferData(format uint32, data []byte, size uint32, freq uint32) {
-	C.alBufferData(C.ALuint(self), C.ALenum(format), unsafe.Pointer(&data[0]),
-		C.ALsizei(size), C.ALsizei(freq));
-	// TODO: pass data as array or pointer?
 }
 
 
