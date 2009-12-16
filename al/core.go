@@ -44,7 +44,7 @@ package al
 /*
 #include <stdlib.h>
 #include <AL/al.h>
-#include "wal.c"
+#include "wrappers.c"
 */
 import "C"
 import "unsafe"
