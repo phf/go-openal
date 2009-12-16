@@ -81,6 +81,13 @@
 // source. In C, you'd say alSourcei(sid, AL_BUFFER, bid).
 // In Go, you can say sid.Seti(Buffer_, bid) as well, but
 // you probably want to say sid.SetBuffer(bid) instead.
+//
+// TODO: Not all convenience functions/methods that should
+// exist are actually there yet. :-/
+//
+// TODO: After we have all the convenience functions/methods,
+// should we get rid of the generic stuff to unclutter the
+// API? Would take us further from OpenAL, but...
 package al
 
 /*
@@ -94,8 +101,8 @@ import "unsafe"
 // TODO: General constants for various purposes.
 const (
 	None = 0; // TODO: no distance model, no buffer for source
-	False = 0;
-	True = 1;
+	alFalse = 0;
+	alTrue = 1;
 )
 
 // TODO: GetInteger() queries.
@@ -118,9 +125,59 @@ const (
 	Extensions = 0xB004;
 )
 
-// TODO: ???
+// TODO: Shared Source/Listener properties.
 const (
+	Pitch = 0x1003; // TODO al.h says shared, docs say only Source?
+	Position = 0x1004;
+	Velocity = 0x1006;
+	Gain = 0x100A;
+)
+
+// TODO: Listener properties.
+const (
+	Orientation = 0x100F;
+)
+
+// TODO: Source queries.
+const (
+	SourceState = 0x1010;
+	BuffersQueued = 0x1015;
+	BuffersProcessed = 0x1016;
+	SourceType = 0x1027; // TODO: not documented as a query?
+)
+
+// Results from source state query.
+const (
+	Initial = 0x1011;
+	Playing = 0x1012;
+	Paused = 0x1013;
+	Stopped = 0x1014;
+)
+
+// TODO: Presumably results from source type query?
+const (
+	Static = 0x1028;
+	Streaming = 0x1029;
+	Undetermined = 0x1030;
+)
+
+// TODO: Source properties.
+const (
+	SourceRelative = 0x202;
+	ConeInnerAngle = 0x1001;
+	ConeOuterAngle = 0x1002;
+	Direction = 0x1005;
+	Looping = 0x1007;
 	Buffer_ = 0x1009;
+	MinGain = 0x100D;
+	MaxGain = 0x100E;
+	SecOffset = 0x1024;
+	SampleOffset = 0x1025;
+	ByteOffset = 0x1026;
+	ReferenceDistance = 0x1020;
+	RolloffFactor = 0x1021;
+	ConeOuterGain = 0x1022;
+	MaxDistance = 0x1023;
 )
 
 func GetString(param uint32) string {
@@ -128,7 +185,7 @@ func GetString(param uint32) string {
 }
 
 func GetBoolean(param uint32) bool {
-	return C.alGetBoolean(C.ALenum(param)) != False;
+	return C.alGetBoolean(C.ALenum(param)) != alFalse;
 }
 
 func GetInteger(param uint32) int32 {
@@ -143,26 +200,30 @@ func GetDouble(param uint32) float64 {
 	return float64(C.alGetDouble(C.ALenum(param)));
 }
 
-func GetBooleanv(param uint32, data []bool) {
+// Renamed, was GetBooleanv.
+func GetBooleans(param uint32, data []bool) {
 	C.walGetBooleanv(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
-func GetIntegerv(param uint32, data []int32) {
+// Renamed, was GetIntegerv.
+func GetIntegers(param uint32, data []int32) {
 	C.walGetIntegerv(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
-func GetFloatv(param uint32, data []float32) {
+// Renamed, was GetFloatv.
+func GetFloats(param uint32, data []float32) {
 	C.walGetFloatv(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
-func GetDoublev(param uint32, data []float64) {
+// Renamed, was GetDoublev.
+func GetDoubles(param uint32, data []float64) {
 	C.walGetDoublev(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
 // Error codes returned by GetError().
 // Can be used with GetString().
 const (
-	NoError = False;
+	NoError = alFalse;
 	InvalidName = 0xA001;
 	InvalidEnum = 0xA002;
 	InvalidValue = 0xA003;
@@ -178,13 +239,13 @@ func GetError() uint32 {
 // IsSource() returns true if id refers to a source.
 // Not very useful as we provide a distinct Source type.
 func IsSource(id uint32) bool {
-	return C.alIsSource(C.ALuint(id)) != False;
+	return C.alIsSource(C.ALuint(id)) != alFalse;
 }
 
 // IsBuffer() returns true if id refers to a buffer.
 // Not very useful as we provide a distinct Buffer type.
 func IsBuffer(id uint32) bool {
-	return C.alIsBuffer(C.ALuint(id)) != False;
+	return C.alIsBuffer(C.ALuint(id)) != alFalse;
 }
 
 // Renamed, was DopplerFactor.
@@ -621,7 +682,7 @@ func (self Buffer) GetSize() uint32 {
 //}
 //
 //func IsEnabled(capability uint32) bool {
-//	return C.alIsEnabled(C.ALenum(capability)) != False;
+//	return C.alIsEnabled(C.ALenum(capability)) != alFalse;
 //}
 
 // These constants are documented as "not yet exposed". We
