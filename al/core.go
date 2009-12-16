@@ -270,12 +270,6 @@ func (self Source) Getiv(param uint32) (values []int32) {
 
 
 
-
-
-
-
-
-
 func (self Source) Play() {
 	C.alSourcePlay(C.ALuint(self));
 }
@@ -291,6 +285,27 @@ func (self Source) Rewind() {
 func (self Source) Pause() {
 	C.alSourcePause(C.ALuint(self));
 }
+
+
+func SourcePlayv(sources []Source) {
+	C.walSourcePlayv(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
+}
+
+func SourceStopv(sources []Source) {
+	C.walSourceStopv(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
+}
+
+func SourceRewindv(sources []Source) {
+	C.walSourceRewindv(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
+}
+
+func SourcePausev(sources []Source) {
+	C.walSourcePausev(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
+}
+
+
+
+
 
 
 func GenBuffers(n int) (buffers []Buffer) {

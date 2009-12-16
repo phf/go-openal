@@ -131,10 +131,22 @@ void walGetSource3i(ALuint sid, ALenum param, void *value1, void *value2, void *
 void walGetSourceiv(ALuint sid, ALenum param, void* values) {
 	alGetSourceiv(sid, param, values);
 }
-void alSourcePlayv( ALsizei ns, const ALuint *sids );
-void alSourceStopv( ALsizei ns, const ALuint *sids );
-void alSourceRewindv( ALsizei ns, const ALuint *sids );
-void alSourcePausev( ALsizei ns, const ALuint *sids );
+// void alSourcePlayv( ALsizei ns, const ALuint *sids );
+void walSourcePlayv(ALsizei ns, const void *sids) {
+	alSourcePlayv(ns, sids);
+}
+// void alSourceStopv( ALsizei ns, const ALuint *sids );
+void walSourceStopv(ALsizei ns, const void *sids) {
+	alSourceStopv(ns, sids);
+}
+// void alSourceRewindv( ALsizei ns, const ALuint *sids );
+void walSourceRewindv(ALsizei ns, const void *sids) {
+	alSourceRewindv(ns, sids);
+}
+// void alSourcePausev( ALsizei ns, const ALuint *sids );
+void walSourcePausev(ALsizei ns, const void *sids) {
+	alSourcePausev(ns, sids);
+}
 //void alSourcePlay( ALuint sid );
 //void alSourceStop( ALuint sid );
 //void alSourceRewind( ALuint sid );
