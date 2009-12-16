@@ -79,8 +79,8 @@
 // the convenience functions we introduced as well. For
 // example consider the task of attaching a buffer to a
 // source. In C, you'd say alSourcei(sid, AL_BUFFER, bid).
-// In Go, you could say sid.Seti(Buffer_, bid) if you
-// wish. But you probably want to say sid.SetBuffer(bid).
+// In Go, you can say sid.Seti(Buffer_, bid) as well, but
+// you probably want to say sid.SetBuffer(bid) instead.
 package al
 
 /*
@@ -91,9 +91,23 @@ package al
 import "C"
 import "unsafe"
 
-// TODO: Get*() queries.
+// TODO: General constants for various purposes.
+const (
+	None = 0; // TODO: no distance model, no buffer for source
+	False = 0;
+	True = 1;
+)
+
+// TODO: GetInteger() queries.
 const (
 	DistanceModel = 0xD000;
+)
+
+// TODO: GetFloat() queries.
+const (
+	DopplerFactor = 0xC000;
+	DopplerVelocity = 0xC001;
+	SpeedOfSound = 0xC003;
 )
 
 // TODO: ???
@@ -139,7 +153,7 @@ func GetDoublev(param uint32, data []float64) {
 
 // Error codes returned by GetError().
 const (
-	NoError = 0;
+	NoError = False;
 	InvalidName = 0xA001;
 	InvalidEnum = 0xA002;
 	InvalidValue = 0xA003;
@@ -199,6 +213,9 @@ func SetDistanceModel(model uint32) {
 
 // Sources represent sound emitters in 3d space.
 type Source uint32;
+
+// TODO: Attributes that can be set/queried with Buffer.*().
+// (Please use convenience methods instead.)
 
 // GenSources() creates n sources.
 func GenSources(n int) (sources []Source) {
@@ -339,6 +356,15 @@ func (self Source) UnqueueBuffers(buffers []Buffer) {
 
 // Buffers are storage space for sample data.
 type Buffer uint32;
+
+// Attributes that can be queried with Buffer.Geti().
+// (Please use convenience methods instead.)
+const (
+	Frequency = 0x2001;
+	Bits = 0x2002;
+	Channels = 0x2003;
+	Size = 0x2004;
+)
 
 // GenBuffers() creates n buffers.
 func GenBuffers(n int) (buffers []Buffer) {
@@ -548,6 +574,26 @@ func GenBuffer() Buffer {
 // Convenience function, see DeleteBuffers().
 func DeleteBuffer(buffer Buffer) {
 	C.walDeleteSource(C.ALuint(buffer));
+}
+
+// Convenience method, see Buffer.Geti().
+func (self Buffer) GetFrequency() uint32 {
+	return uint32(self.Geti(Frequency));
+}
+
+// Convenience method, see Buffer.Geti().
+func (self Buffer) GetBits() uint32 {
+	return uint32(self.Geti(Bits));
+}
+
+// Convenience method, see Buffer.Geti().
+func (self Buffer) GetChannels() uint32 {
+	return uint32(self.Geti(Channels));
+}
+
+// Convenience method, see Buffer.Geti().
+func (self Buffer) GetSize() uint32 {
+	return uint32(self.Geti(Size));
 }
 
 ///// Crap ///////////////////////////////////////////////////////////
