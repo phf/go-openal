@@ -21,20 +21,50 @@
 //	ALenum		uint32	(although al.h suggests int32)
 //	ALfloat		float32
 //	ALdouble	float64
-//	ALvoid		-
+//	ALvoid		not applicable (but see below)
 //
 // We also stick to these (not mentioned explicitly in
 // OpenAL):
 //
-//	ALvoid*		unsafe.Pointer
+//	ALvoid*		unsafe.Pointer (but never exported)
 //	ALchar*		string
 //
-// Overall, the correspondence of types hopefully feels
-// natural enough.
+// Finally, in places where OpenAL expects pointers to
+// C-style arrays, we use Go slices if appropriate:
 //
-// XXX: conflicts between constants and functions, for
-// example DistanceModel and DistanceModel() and how
-// they are resolved.
+//	ALboolean*	[]bool
+//	ALvoid*		[]byte (see BufferData() for example)
+//	ALint*		[]int32
+//	ALuint*		[]uint32 []Source []Buffer
+//	ALfloat*	[]float32
+//	ALdouble*	[]float64
+//
+// Overall, the correspondence of types hopefully feels
+// natural enough. Note that many of these types do not
+// actually occur in the API.
+//
+// The names of OpenAL constants follow the established
+// Go conventions: instead of AL_FORMAT_MONO16 we use
+// FormatMono16 for example.
+//
+// Conversion to Go's camel case notation does however
+// lead to name clashes between constants and functions.
+// For example, AL_DISTANCE_MODEL becomes DistanceModel
+// which collides with the OpenAL function of the same
+// name used to set the current distance model. We have
+// to rename either the constant or the function, and
+// since the function name seems to be at fault (it's a
+// setter but doesn't make that obvious), we rename the
+// function.
+//
+// In fact, we renamed plenty of functions, not just the
+// ones where collisions with constants were the driving
+// force. For example, instead of the Sourcef/GetSourcef
+// abomination, we use Getf and Setf methods on a Source
+// type. Everything should still be easily recognizable
+// for OpenAL hackers, but this structure is a lot more
+// sensible (and reveals that the OpenAL API is actually
+// not such a bad design).
 //
 // TODO: write wrappers with better names around GetInteger()
 // and friends? for example GetDistanceModel()? could go into
