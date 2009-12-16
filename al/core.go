@@ -60,9 +60,9 @@
 // In fact, we renamed plenty of functions, not just the
 // ones where collisions with constants were the driving
 // force. For example, instead of the Sourcef/GetSourcef
-// abomination, we use Getf and Setf methods on a Source
-// type. Everything should still be easily recognizable
-// for OpenAL hackers, but this structure is a lot more
+// abomination, we use Getf/Setf methods on a Source type.
+// Everything should still be easily recognizable for
+// OpenAL hackers, but this structure is a lot more
 // sensible (and reveals that the OpenAL API is actually
 // not such a bad design).
 //
@@ -92,21 +92,6 @@ const (
 // in the AL state machine.
 func GetError() uint32 {
 	return uint32(C.alGetError());
-}
-
-// Useless since OpenAL does not yet define any capabilities.
-func Enable(capability uint32) {
-	C.alEnable(C.ALenum(capability));
-}
-
-// Useless since OpenAL does not yet define any capabilities.
-func Disable(capability uint32) {
-	C.alDisable(C.ALenum(capability));
-}
-
-// Useless since OpenAL does not yet define any capabilities.
-func IsEnabled(capability uint32) bool {
-	return C.alIsEnabled(C.ALenum(capability)) != 0;
 }
 
 // IsSource() returns true if id refers to a source.
@@ -513,3 +498,20 @@ func (self Listener) Getiv(param uint32) (values []int32) {
 const (
 	AlBuffer = 0x1009;
 )
+
+// These functions are wrapped and should work fine, but they
+// have no purpose: There are *no* capabilities in OpenAL 1.1
+// which is the latest specification. So we removed from from
+// the API for now, it's complicated enough without them.
+//
+//func Enable(capability uint32) {
+//	C.alEnable(C.ALenum(capability));
+//}
+//
+//func Disable(capability uint32) {
+//	C.alDisable(C.ALenum(capability));
+//}
+//
+//func IsEnabled(capability uint32) bool {
+//	return C.alIsEnabled(C.ALenum(capability)) != 0;
+//}
