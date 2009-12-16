@@ -2,6 +2,11 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// It's sad but the OpenAL C API uses lots and lots of typedefs
+// that require wrapper functions (using basic C types) for cgo
+// to grok them. So there's a lot more C code here than I would
+// like...
+
 // I keep all the al.h prototypes here for now, for reference.
 // They'll go away eventually. Those commented out are already
 // accessible from Go.
@@ -154,7 +159,7 @@ void alGetBufferiv( ALuint bid, ALenum param, ALint* values );
 // For convenience we offer "singular" versions of the following
 // calls as well, which require different wrappers if we want to
 // be efficient. The main reason for "singular" versions is that
-// Go doesn't allow us to treat a variable as an array.
+// Go doesn't allow us to treat a variable as an array of size 1.
 
 ALuint walGenSource(void) {
 	ALuint source;

@@ -43,14 +43,7 @@ package al
 
 /*
 #include <stdlib.h>
-
-// It's sad but the OpenAL C API uses lots and lots of typedefs
-// that require wrapper functions (using basic C types) for cgo
-// to grok them. So there's a lot more C code here than I would
-// like...
-
 #include <AL/al.h>
-
 #include "wal.c"
 */
 import "C"
