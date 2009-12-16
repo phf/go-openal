@@ -147,12 +147,18 @@ void walSourceRewindv(ALsizei ns, const void *sids) {
 void walSourcePausev(ALsizei ns, const void *sids) {
 	alSourcePausev(ns, sids);
 }
-//void alSourcePlay( ALuint sid );
-//void alSourceStop( ALuint sid );
-//void alSourceRewind( ALuint sid );
-//void alSourcePause( ALuint sid );
-void alSourceQueueBuffers( ALuint sid, ALsizei numEntries, const ALuint *bids );
-void alSourceUnqueueBuffers( ALuint sid, ALsizei numEntries, ALuint *bids );
+// void alSourcePlay( ALuint sid );
+// void alSourceStop( ALuint sid );
+// void alSourceRewind( ALuint sid );
+// void alSourcePause( ALuint sid );
+// void alSourceQueueBuffers( ALuint sid, ALsizei numEntries, const ALuint *bids );
+void walSourceQueueBuffers(ALuint sid, ALsizei numEntries, const void *bids) {
+	alSourceQueueBuffers(sid, numEntries, bids);
+}
+//void alSourceUnqueueBuffers( ALuint sid, ALsizei numEntries, ALuint *bids );
+void walSourceUnqueueBuffers(ALuint sid, ALsizei numEntries, void *bids) {
+	alSourceUnqueueBuffers(sid, numEntries, bids);
+}
 //void alGenBuffers( ALsizei n, ALuint* buffers );
 void walGenBuffers(ALsizei n, void *buffers) {
 	alGenBuffers(n, buffers);

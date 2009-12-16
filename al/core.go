@@ -287,6 +287,16 @@ func (self Source) Pause() {
 }
 
 
+func (self Source) QueueBuffers(buffers []Buffer) {
+	C.walSourceQueueBuffers(C.ALuint(self), C.ALsizei(len(buffers)), unsafe.Pointer(&buffers[0]));
+}
+
+func (self Source) UnueueBuffers(buffers []Buffer) {
+	C.walSourceUnqueueBuffers(C.ALuint(self), C.ALsizei(len(buffers)), unsafe.Pointer(&buffers[0]));
+}
+
+
+
 func SourcePlayv(sources []Source) {
 	C.walSourcePlayv(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
 }
