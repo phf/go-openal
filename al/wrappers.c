@@ -18,10 +18,22 @@
 const char *walGetString(ALenum param) {
 	return alGetString(param);
 }
-void alGetBooleanv( ALenum param, ALboolean* data );
-void alGetIntegerv( ALenum param, ALint* data );
-void alGetFloatv( ALenum param, ALfloat* data );
-void alGetDoublev( ALenum param, ALdouble* data );
+// void alGetBooleanv( ALenum param, ALboolean* data );
+void walGetBooleanv(ALenum param, void* data) {
+	alGetBooleanv(param, data);
+}
+// void alGetIntegerv( ALenum param, ALint* data );
+void walGetIntegerv(ALenum param, void* data) {
+	alGetIntegerv(param, data);
+}
+// void alGetFloatv( ALenum param, ALfloat* data );
+void walGetFloatv(ALenum param, void* data) {
+	alGetFloatv(param, data);
+}
+// void alGetDoublev( ALenum param, ALdouble* data );
+void walGetDoublev(ALenum param, void* data) {
+	alGetDoublev(param, data);
+}
 // ALboolean alGetBoolean( ALenum param );
 // ALint alGetInteger( ALenum param );
 // ALfloat alGetFloat( ALenum param );

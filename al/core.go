@@ -166,6 +166,28 @@ func GetDouble(param uint32) float64 {
 	return float64(C.alGetDouble(C.ALenum(param)));
 }
 
+func GetBooleanv(param uint32, data []bool) {
+	C.walGetBooleanv(C.ALenum(param), unsafe.Pointer(&data[0]));
+}
+
+func GetIntegerv(param uint32, data []int32) {
+	C.walGetIntegerv(C.ALenum(param), unsafe.Pointer(&data[0]));
+}
+
+func GetFloatv(param uint32, data []float32) {
+	C.walGetFloatv(C.ALenum(param), unsafe.Pointer(&data[0]));
+}
+
+func GetDoublev(param uint32, data []float64) {
+	C.walGetDoublev(C.ALenum(param), unsafe.Pointer(&data[0]));
+}
+
+
+
+
+
+
+
 func GenSources(n int) (sources []Source) {
 	sources = make([]Source, n);
 	C.walGenSources(C.ALsizei(n), unsafe.Pointer(&sources[0]));
