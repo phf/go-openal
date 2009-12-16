@@ -150,6 +150,21 @@ func GetString(param uint32) string {
 	return C.GoString(C.walGetString(C.ALenum(param)));
 }
 
+func GetBoolean(param uint32) bool {
+	return C.alGetBoolean(C.ALenum(param)) != 0;
+}
+
+func GetInteger(param uint32) int32 {
+	return int32(C.alGetInteger(C.ALenum(param)));
+}
+
+func GetFloat(param uint32) float32 {
+	return float32(C.alGetFloat(C.ALenum(param)));
+}
+
+func GetDouble(param uint32) float64 {
+	return float64(C.alGetDouble(C.ALenum(param)));
+}
 
 func GenSources(n int) (sources []Source) {
 	sources = make([]Source, n);
@@ -274,6 +289,71 @@ func DeleteBuffers(buffers []Buffer) {
 func DeleteBuffer(buffer Buffer) {
 	C.walDeleteSource(C.ALuint(buffer));
 }
+
+
+
+
+
+func (self Buffer) Setf(param uint32, value float32) {
+	C.alBufferf(C.ALuint(self), C.ALenum(param), C.ALfloat(value));
+}
+
+func (self Buffer) Set3f(param uint32, value1, value2, value3 float32) {
+	C.alBuffer3f(C.ALuint(self), C.ALenum(param), C.ALfloat(value1), C.ALfloat(value2), C.ALfloat(value3));
+}
+
+func (self Buffer) Setfv(param uint32, values []float32) {
+	C.walBufferfv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
+}
+
+func (self Buffer) Seti(param uint32, value int32) {
+	C.alBufferi(C.ALuint(self), C.ALenum(param), C.ALint(value));
+}
+
+func (self Buffer) Set3i(param uint32, value1, value2, value3 int32) {
+	C.alBuffer3i(C.ALuint(self), C.ALenum(param), C.ALint(value1), C.ALint(value2), C.ALint(value3));
+}
+
+func (self Buffer) Setiv(param uint32, values []int32) {
+	C.walBufferiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
+}
+
+func (self Buffer) Getf(param uint32) float32 {
+	return float32(C.walGetBufferf(C.ALuint(self), C.ALenum(param)));
+}
+
+func (self Buffer) Get3f(param uint32) (value1, value2, value3 float32) {
+	var v1, v2, v3 float32;
+	C.walGetBuffer3f(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
+		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
+	value1, value2, value3 = v1, v2, v3;
+	return;
+}
+
+func (self Buffer) Getfv(param uint32) (values []float32) {
+	C.walGetBufferfv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
+	return;
+}
+
+func (self Buffer) Geti(param uint32) int32 {
+	return int32(C.walGetBufferi(C.ALuint(self), C.ALenum(param)));
+}
+
+func (self Buffer) Get3i(param uint32) (value1, value2, value3 int32) {
+	var v1, v2, v3 int32;
+	C.walGetBuffer3i(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
+		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
+	value1, value2, value3 = v1, v2, v3;
+	return;
+}
+
+func (self Buffer) Getiv(param uint32) (values []int32) {
+	C.walGetBufferiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
+	return;
+}
+
+
+
 
 
 

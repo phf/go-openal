@@ -22,10 +22,10 @@ void alGetBooleanv( ALenum param, ALboolean* data );
 void alGetIntegerv( ALenum param, ALint* data );
 void alGetFloatv( ALenum param, ALfloat* data );
 void alGetDoublev( ALenum param, ALdouble* data );
-ALboolean alGetBoolean( ALenum param );
-ALint alGetInteger( ALenum param );
-ALfloat alGetFloat( ALenum param );
-ALdouble alGetDouble( ALenum param );
+// ALboolean alGetBoolean( ALenum param );
+// ALint alGetInteger( ALenum param );
+// ALfloat alGetFloat( ALenum param );
+// ALdouble alGetDouble( ALenum param );
 // ALenum alGetError( void );
 ALboolean alIsExtensionPresent( const ALchar* extname );
 void* alGetProcAddress( const ALchar* fname );
@@ -139,18 +139,46 @@ void walDeleteBuffers(ALsizei n, const void *buffers) {
 }
 // ALboolean alIsBuffer( ALuint bid );
 // void alBufferData( ALuint bid, ALenum format, const ALvoid* data, ALsizei size, ALsizei freq );
-void alBufferf( ALuint bid, ALenum param, ALfloat value );
-void alBuffer3f( ALuint bid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
-void alBufferfv( ALuint bid, ALenum param, const ALfloat* values );
-void alBufferi( ALuint bid, ALenum param, ALint value );
-void alBuffer3i( ALuint bid, ALenum param, ALint value1, ALint value2, ALint value3 );
-void alBufferiv( ALuint bid, ALenum param, const ALint* values );
-void alGetBufferf( ALuint bid, ALenum param, ALfloat* value );
-void alGetBuffer3f( ALuint bid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
-void alGetBufferfv( ALuint bid, ALenum param, ALfloat* values );
-void alGetBufferi( ALuint bid, ALenum param, ALint* value );
-void alGetBuffer3i( ALuint bid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
-void alGetBufferiv( ALuint bid, ALenum param, ALint* values );
+// void alBufferf( ALuint bid, ALenum param, ALfloat value );
+// void alBuffer3f( ALuint bid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
+// void alBufferfv( ALuint bid, ALenum param, const ALfloat* values );
+void walBufferfv(ALuint bid, ALenum param, const void* values) {
+	alBufferfv(bid, param, values);
+}
+//void alBufferi( ALuint bid, ALenum param, ALint value );
+//void alBuffer3i( ALuint bid, ALenum param, ALint value1, ALint value2, ALint value3 );
+//void alBufferiv( ALuint bid, ALenum param, const ALint* values );
+void walBufferiv(ALuint bid, ALenum param, const void* values) {
+	alBufferiv(bid, param, values);
+}
+// void alGetBufferf( ALuint bid, ALenum param, ALfloat* value );
+ALfloat walGetBufferf(ALuint bid, ALenum param) {
+	ALfloat result;
+	alGetBufferf(bid, param, &result);
+	return result;
+}
+// void alGetBuffer3f( ALuint bid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
+void walGetBuffer3f(ALuint bid, ALenum param, void *value1, void *value2, void *value3) {
+	alGetBuffer3f(bid, param, value1, value2, value3);
+}
+// void alGetBufferfv( ALuint bid, ALenum param, ALfloat* values );
+void walGetBufferfv(ALuint bid, ALenum param, void* values) {
+	alGetBufferfv(bid, param, values);
+}
+// void alGetBufferi( ALuint bid, ALenum param, ALint* value );
+ALint walGetBufferi(ALuint bid, ALenum param) {
+	ALint result;
+	alGetBufferi(bid, param, &result);
+	return result;
+}
+// void alGetBuffer3i( ALuint bid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
+void walGetBuffer3i(ALuint bid, ALenum param, void *value1, void *value2, void *value3) {
+	alGetBuffer3i(bid, param, value1, value2, value3);
+}
+// void alGetBufferiv( ALuint bid, ALenum param, ALint* values );
+void walGetBufferiv(ALuint bid, ALenum param, void* values) {
+	alGetBufferiv(bid, param, values);
+}
 // void alDopplerFactor( ALfloat value );
 // void alDopplerVelocity( ALfloat value );
 // void alSpeedOfSound( ALfloat value );
