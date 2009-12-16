@@ -41,3 +41,23 @@ func GetDopplerVelocity() float32 {
 func GetSpeedOfSound() float32 {
 	return GetFloat(SpeedOfSound);
 }
+
+// Convenience function, see GetString().
+func GetVendor() string {
+	return GetString(Vendor);
+}
+
+// Convenience function, see GetString().
+func GetVersion() string {
+	return GetString(Version);
+}
+
+// Convenience function, see GetString().
+func GetRenderer() string {
+	return GetString(Renderer);
+}
+
+// Convenience function, see GetString().
+func GetExtensions() string {
+	return GetString(Extensions);
+}

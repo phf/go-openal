@@ -110,6 +110,14 @@ const (
 	SpeedOfSound = 0xC003;
 )
 
+// TODO: GetString() queries.
+const (
+	Vendor = 0xB001;
+	Version = 0xB002;
+	Renderer = 0xB003;
+	Extensions = 0xB004;
+)
+
 // TODO: ???
 const (
 	Buffer_ = 0x1009;
@@ -120,7 +128,7 @@ func GetString(param uint32) string {
 }
 
 func GetBoolean(param uint32) bool {
-	return C.alGetBoolean(C.ALenum(param)) != 0;
+	return C.alGetBoolean(C.ALenum(param)) != False;
 }
 
 func GetInteger(param uint32) int32 {
@@ -152,6 +160,7 @@ func GetDoublev(param uint32, data []float64) {
 }
 
 // Error codes returned by GetError().
+// Can be used with GetString().
 const (
 	NoError = False;
 	InvalidName = 0xA001;
@@ -169,13 +178,13 @@ func GetError() uint32 {
 // IsSource() returns true if id refers to a source.
 // Not very useful as we provide a distinct Source type.
 func IsSource(id uint32) bool {
-	return C.alIsSource(C.ALuint(id)) != 0;
+	return C.alIsSource(C.ALuint(id)) != False;
 }
 
 // IsBuffer() returns true if id refers to a buffer.
 // Not very useful as we provide a distinct Buffer type.
 func IsBuffer(id uint32) bool {
-	return C.alIsBuffer(C.ALuint(id)) != 0;
+	return C.alIsBuffer(C.ALuint(id)) != False;
 }
 
 // Renamed, was DopplerFactor.
@@ -612,5 +621,15 @@ func (self Buffer) GetSize() uint32 {
 //}
 //
 //func IsEnabled(capability uint32) bool {
-//	return C.alIsEnabled(C.ALenum(capability)) != 0;
+//	return C.alIsEnabled(C.ALenum(capability)) != False;
 //}
+
+// These constants are documented as "not yet exposed". We
+// keep them here in case they ever become valid. They are
+// buffer states.
+//
+//const (
+//	Unused = 0x2010;
+//	Pending = 0x2011;
+//	Processed = 0x2012;
+//)
