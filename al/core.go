@@ -306,7 +306,7 @@ func (self Source) QueueBuffers(buffers []Buffer) {
 	C.walSourceQueueBuffers(C.ALuint(self), C.ALsizei(len(buffers)), unsafe.Pointer(&buffers[0]));
 }
 
-func (self Source) UnueueBuffers(buffers []Buffer) {
+func (self Source) UnqueueBuffers(buffers []Buffer) {
 	C.walSourceUnqueueBuffers(C.ALuint(self), C.ALsizei(len(buffers)), unsafe.Pointer(&buffers[0]));
 }
 
