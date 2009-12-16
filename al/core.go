@@ -33,7 +33,7 @@
 // C-style arrays, we use Go slices if appropriate:
 //
 //	ALboolean*	[]bool
-//	ALvoid*		[]byte (see BufferData() for example)
+//	ALvoid*		[]byte (see SetBufferData() for example)
 //	ALint*		[]int32
 //	ALuint*		[]uint32 []Source []Buffer
 //	ALfloat*	[]float32
@@ -65,6 +65,20 @@
 // OpenAL hackers, but this structure is a lot more
 // sensible (and reveals that the OpenAL API is actually
 // not such a bad design).
+//
+// There are a few cases where constants would collide
+// with the names of types we introduced here. Since the
+// types serve a much more important function, we renamed
+// the constants in those cases. For example AL_BUFFER
+// would collide with the type Buffer so it's name is now
+// Buffer_ instead. Not pretty, but in many cases you
+// don't need the constants anyway as the functionality
+// they represent is probably available through one of
+// the convenience functions we introduced as well. For
+// example consider the task of attaching a buffer to a
+// source. In C, you'd say alSourcei(sid, AL_BUFFER, bid).
+// In Go, you could say sid.Seti(Buffer_, bid) if you
+// wish. But you probably want to say sid.SetBuffer(bid).
 //
 // TODO: write wrappers with better names around GetInteger()
 // and friends? for example GetDistanceModel()? could go into
@@ -106,25 +120,29 @@ func IsBuffer(id uint32) bool {
 	return C.alIsBuffer(C.ALuint(id)) != 0;
 }
 
-// Sources represent sound emitters in 3d space.
-type Source uint32;
 
-// Buffers are storage space for sample data.
-type Buffer uint32;
+func DopplerFactor (value float32) {
+	C.alDopplerFactor(C.ALfloat(value));
+}
 
-// Listener represents the singleton receiver of
-// sound in 3d space.
-//
-// We "fake" this type so we can provide OpenAL
-// listener calls as methods. This is convenient
-// and makes all those calls consistent with the
-// way they work for Source and Buffer. You can't
-// make new listeners, there's only one!
-type Listener struct{};
+func DopplerVelocity (value float32) {
+	C.alDopplerVelocity(C.ALfloat(value));
+}
+
+func SpeedOfSound (value float32) {
+	C.alSpeedOfSound(C.ALfloat(value));
+}
+
+
 
 // TODO: Get*() queries.
 const (
 	DistanceModel = 0xD000;
+)
+
+// TODO: ???
+const (
+	Buffer_ = 0x1009;
 )
 
 // Distance models passed to SetDistanceModel().
@@ -142,24 +160,6 @@ const (
 func SetDistanceModel(model uint32) {
 	C.alDistanceModel(C.ALenum(model));
 }
-
-// Format of sound samples passed to BufferData().
-const (
-	FormatMono8 = 0x1100;
-	FormatMono16 = 0x1101;
-	FormatStereo8 = 0x1102;
-	FormatStereo16 = 0x1103;
-)
-
-// BufferData() specifies the sample data the buffer should use.
-// Depending on the format, the data slice has to be a multiple
-// of two or four bytes long. The frequency is given in Hz.
-func (self Buffer) BufferData(format uint32, data []byte, frequency uint32) {
-	C.alBufferData(C.ALuint(self), C.ALenum(format), unsafe.Pointer(&data[0]),
-		C.ALsizei(len(data)), C.ALsizei(frequency));
-}
-
-// NOT DOCUMENTED YET
 
 func GetString(param uint32) string {
 	return C.GoString(C.walGetString(C.ALenum(param)));
@@ -199,9 +199,10 @@ func GetDoublev(param uint32, data []float64) {
 
 
 
+///// Source /////////////////////////////////////////////////////////
 
-
-
+// Sources represent sound emitters in 3d space.
+type Source uint32;
 
 func GenSources(n int) (sources []Source) {
 	sources = make([]Source, n);
@@ -209,21 +210,10 @@ func GenSources(n int) (sources []Source) {
 	return;
 }
 
-func GenSource() Source {
-	return Source(C.walGenSource());
-}
-
 func DeleteSources(sources []Source) {
 	n := len(sources);
 	C.walDeleteSources(C.ALsizei(n), unsafe.Pointer(&sources[0]));
 }
-
-func DeleteSource(source Source) {
-	C.walDeleteSource(C.ALuint(source));
-}
-
-
-
 
 func (self Source) Setf(param uint32, value float32) {
 	C.alSourcef(C.ALuint(self), C.ALenum(param), C.ALfloat(value));
@@ -283,8 +273,6 @@ func (self Source) Getiv(param uint32) (values []int32) {
 	return;
 }
 
-
-
 func (self Source) Play() {
 	C.alSourcePlay(C.ALuint(self));
 }
@@ -301,7 +289,6 @@ func (self Source) Pause() {
 	C.alSourcePause(C.ALuint(self));
 }
 
-
 func (self Source) QueueBuffers(buffers []Buffer) {
 	C.walSourceQueueBuffers(C.ALuint(self), C.ALsizei(len(buffers)), unsafe.Pointer(&buffers[0]));
 }
@@ -309,8 +296,6 @@ func (self Source) QueueBuffers(buffers []Buffer) {
 func (self Source) UnqueueBuffers(buffers []Buffer) {
 	C.walSourceUnqueueBuffers(C.ALuint(self), C.ALsizei(len(buffers)), unsafe.Pointer(&buffers[0]));
 }
-
-
 
 func SourcePlayv(sources []Source) {
 	C.walSourcePlayv(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
@@ -328,62 +313,60 @@ func SourcePausev(sources []Source) {
 	C.walSourcePausev(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
 }
 
+///// Buffer /////////////////////////////////////////////////////////
 
+// Buffers are storage space for sample data.
+type Buffer uint32;
 
-
-
-
+// GenBuffers() creates n buffers.
 func GenBuffers(n int) (buffers []Buffer) {
 	buffers = make([]Buffer, n);
 	C.walGenBuffers(C.ALsizei(n), unsafe.Pointer(&buffers[0]));
 	return;
 }
 
-func GenBuffer() Buffer {
-	return Buffer(C.walGenBuffer());
-}
-
+// DeleteBuffers() deletes the given buffers.
 func DeleteBuffers(buffers []Buffer) {
 	n := len(buffers);
 	C.walDeleteBuffers(C.ALsizei(n), unsafe.Pointer(&buffers[0]));
 }
 
-func DeleteBuffer(buffer Buffer) {
-	C.walDeleteSource(C.ALuint(buffer));
-}
-
-
-
-
-
+// Renamed, was Bufferf.
 func (self Buffer) Setf(param uint32, value float32) {
 	C.alBufferf(C.ALuint(self), C.ALenum(param), C.ALfloat(value));
 }
 
+// Renamed, was Buffer3f.
 func (self Buffer) Set3f(param uint32, value1, value2, value3 float32) {
 	C.alBuffer3f(C.ALuint(self), C.ALenum(param), C.ALfloat(value1), C.ALfloat(value2), C.ALfloat(value3));
 }
 
+// Renamed, was Bufferfv.
 func (self Buffer) Setfv(param uint32, values []float32) {
 	C.walBufferfv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
+// Renamed, was Bufferi.
 func (self Buffer) Seti(param uint32, value int32) {
 	C.alBufferi(C.ALuint(self), C.ALenum(param), C.ALint(value));
 }
 
+// Renamed, was Buffer3i.
 func (self Buffer) Set3i(param uint32, value1, value2, value3 int32) {
 	C.alBuffer3i(C.ALuint(self), C.ALenum(param), C.ALint(value1), C.ALint(value2), C.ALint(value3));
 }
 
+// Renamed, was Bufferiv.
 func (self Buffer) Setiv(param uint32, values []int32) {
 	C.walBufferiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
+// Renamed, was GetBufferf.
 func (self Buffer) Getf(param uint32) float32 {
 	return float32(C.walGetBufferf(C.ALuint(self), C.ALenum(param)));
 }
 
+// Renamed, was GetBuffer3f.
 func (self Buffer) Get3f(param uint32) (value1, value2, value3 float32) {
 	var v1, v2, v3 float32;
 	C.walGetBuffer3f(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
@@ -392,15 +375,18 @@ func (self Buffer) Get3f(param uint32) (value1, value2, value3 float32) {
 	return;
 }
 
+// Renamed, was GetBufferfv.
 func (self Buffer) Getfv(param uint32) (values []float32) {
 	C.walGetBufferfv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 	return;
 }
 
+// Renamed, was GetBufferi.
 func (self Buffer) Geti(param uint32) int32 {
 	return int32(C.walGetBufferi(C.ALuint(self), C.ALenum(param)));
 }
 
+// Renamed, was GetBuffer3i.
 func (self Buffer) Get3i(param uint32) (value1, value2, value3 int32) {
 	var v1, v2, v3 int32;
 	C.walGetBuffer3i(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
@@ -409,59 +395,79 @@ func (self Buffer) Get3i(param uint32) (value1, value2, value3 int32) {
 	return;
 }
 
+// Renamed, was GetBufferiv.
 func (self Buffer) Getiv(param uint32) (values []int32) {
 	C.walGetBufferiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 	return;
 }
 
+// Format of sound samples passed to SetBufferData().
+const (
+	FormatMono8 = 0x1100;
+	FormatMono16 = 0x1101;
+	FormatStereo8 = 0x1102;
+	FormatStereo16 = 0x1103;
+)
 
-
-
-
-
-func DopplerFactor (value float32) {
-	C.alDopplerFactor(C.ALfloat(value));
+// SetBufferData() specifies the sample data the buffer should use.
+// For FormatMono16 and FormatStereo8 the data slice must be a
+// multiple of two bytes long; for FormatStereo16 the data slice
+// must be a multiple of four bytes long. The frequency is given
+// in Hz.
+// Renamed, was BufferData.
+func (self Buffer) SetBufferData(format uint32, data []byte, frequency uint32) {
+	C.alBufferData(C.ALuint(self), C.ALenum(format), unsafe.Pointer(&data[0]),
+		C.ALsizei(len(data)), C.ALsizei(frequency));
 }
 
-func DopplerVelocity (value float32) {
-	C.alDopplerVelocity(C.ALfloat(value));
-}
+///// Listener ///////////////////////////////////////////////////////
 
-func SpeedOfSound (value float32) {
-	C.alSpeedOfSound(C.ALfloat(value));
-}
+// Listener represents the singleton receiver of
+// sound in 3d space.
+//
+// We "fake" this type so we can provide OpenAL
+// listener calls as methods. This is convenient
+// and makes all those calls consistent with the
+// way they work for Source and Buffer. You can't
+// make new listeners, there's only one!
+type Listener struct{};
 
-
-
-
+// Renamed, was Listenerf.
 func (self Listener) Setf(param uint32, value float32) {
 	C.alListenerf(C.ALenum(param), C.ALfloat(value));
 }
 
+// Renamed, was Listener3f.
 func (self Listener) Set3f(param uint32, value1, value2, value3 float32) {
 	C.alListener3f(C.ALenum(param), C.ALfloat(value1), C.ALfloat(value2), C.ALfloat(value3));
 }
 
+// Renamed, was Listenerfv.
 func (self Listener) Setfv(param uint32, values []float32) {
 	C.walListenerfv(C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
+// Renamed, was Listeneri.
 func (self Listener) Seti(param uint32, value int32) {
 	C.alListeneri(C.ALenum(param), C.ALint(value));
 }
 
+// Renamed, was Listener3i.
 func (self Listener) Set3i(param uint32, value1, value2, value3 int32) {
 	C.alListener3i(C.ALenum(param), C.ALint(value1), C.ALint(value2), C.ALint(value3));
 }
 
+// Renamed, was Listeneriv.
 func (self Listener) Setiv(param uint32, values []int32) {
 	C.walListeneriv(C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
+// Renamed, was GetListenerf.
 func (self Listener) Getf(param uint32) float32 {
 	return float32(C.walGetListenerf(C.ALenum(param)));
 }
 
+// Renamed, was GetListener3f.
 func (self Listener) Get3f(param uint32) (value1, value2, value3 float32) {
 	var v1, v2, v3 float32;
 	C.walGetListener3f(C.ALenum(param), unsafe.Pointer(&v1),
@@ -470,15 +476,18 @@ func (self Listener) Get3f(param uint32) (value1, value2, value3 float32) {
 	return;
 }
 
+// Renamed, was GetListenerfv.
 func (self Listener) Getfv(param uint32) (values []float32) {
 	C.walGetListenerfv(C.ALenum(param), unsafe.Pointer(&values[0]));
 	return;
 }
 
+// Renamed, was GetListeneri.
 func (self Listener) Geti(param uint32) int32 {
 	return int32(C.walGetListeneri(C.ALenum(param)));
 }
 
+// Renamed, was GetListener3i.
 func (self Listener) Get3i(param uint32) (value1, value2, value3 int32) {
 	var v1, v2, v3 int32;
 	C.walGetListener3i(C.ALenum(param), unsafe.Pointer(&v1),
@@ -487,17 +496,39 @@ func (self Listener) Get3i(param uint32) (value1, value2, value3 int32) {
 	return;
 }
 
+// Renamed, was GetListeneriv.
 func (self Listener) Getiv(param uint32) (values []int32) {
 	C.walGetListeneriv(C.ALenum(param), unsafe.Pointer(&values[0]));
 	return;
 }
 
+///// Convenience ////////////////////////////////////////////////////
 
-// NOT CLEANED UP YET
+// GenSource() creates a single source.
+// Convenience function, see GenSources().
+func GenSource() Source {
+	return Source(C.walGenSource());
+}
 
-const (
-	AlBuffer = 0x1009;
-)
+// DeleteSource() deletes a single source.
+// Convenience function, see DeleteSources().
+func DeleteSource(source Source) {
+	C.walDeleteSource(C.ALuint(source));
+}
+
+// GenBuffer() creates a single buffer.
+// Convenience function, see GenBuffers().
+func GenBuffer() Buffer {
+	return Buffer(C.walGenBuffer());
+}
+
+// DeleteBuffer() deletes a single buffer.
+// Convenience function, see DeleteBuffers().
+func DeleteBuffer(buffer Buffer) {
+	C.walDeleteSource(C.ALuint(buffer));
+}
+
+///// Crap ///////////////////////////////////////////////////////////
 
 // These functions are wrapped and should work fine, but they
 // have no purpose: There are *no* capabilities in OpenAL 1.1
