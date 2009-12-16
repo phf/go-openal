@@ -5,6 +5,8 @@
 // C-level binding for OpenAL's "al" API.
 //
 // Please consider using the Go-level binding instead.
+// See http://connect.creativelabs.com/openal/Documentation/OpenAL%201.1%20Specification.htm
+// for details about OpenAL not described here.
 //
 // OpenAL types are (in principle) mapped to Go types as
 // follows:
@@ -93,48 +95,6 @@ package al
 import "C"
 import "unsafe"
 
-// Error codes returned by GetError().
-const (
-	NoError = 0;
-	InvalidName = 0xA001;
-	InvalidEnum = 0xA002;
-	InvalidValue = 0xA003;
-	InvalidOperation = 0xA004;
-)
-
-// GetError() returns the most recent error generated
-// in the AL state machine.
-func GetError() uint32 {
-	return uint32(C.alGetError());
-}
-
-// IsSource() returns true if id refers to a source.
-// Not very useful as we provide a distinct Source type.
-func IsSource(id uint32) bool {
-	return C.alIsSource(C.ALuint(id)) != 0;
-}
-
-// IsBuffer() returns true if id refers to a buffer.
-// Not very useful as we provide a distinct Buffer type.
-func IsBuffer(id uint32) bool {
-	return C.alIsBuffer(C.ALuint(id)) != 0;
-}
-
-
-func DopplerFactor (value float32) {
-	C.alDopplerFactor(C.ALfloat(value));
-}
-
-func DopplerVelocity (value float32) {
-	C.alDopplerVelocity(C.ALfloat(value));
-}
-
-func SpeedOfSound (value float32) {
-	C.alSpeedOfSound(C.ALfloat(value));
-}
-
-
-
 // TODO: Get*() queries.
 const (
 	DistanceModel = 0xD000;
@@ -144,22 +104,6 @@ const (
 const (
 	Buffer_ = 0x1009;
 )
-
-// Distance models passed to SetDistanceModel().
-const (
-	InverseDistance = 0xD001;
-	InverseDistanceClamped = 0xD002;
-	LinearDistance = 0xD003;
-	LinearDistanceClamped = 0xD004;
-	ExponentDistance = 0xD005;
-	ExponentDistanceClamped = 0xD006;
-)
-
-// SetDistanceModel() changes the current distance model.
-// This is just DistanceModel() in OpenAL.
-func SetDistanceModel(model uint32) {
-	C.alDistanceModel(C.ALenum(model));
-}
 
 func GetString(param uint32) string {
 	return C.GoString(C.walGetString(C.ALenum(param)));
@@ -197,52 +141,138 @@ func GetDoublev(param uint32, data []float64) {
 	C.walGetDoublev(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
+// Error codes returned by GetError().
+const (
+	NoError = 0;
+	InvalidName = 0xA001;
+	InvalidEnum = 0xA002;
+	InvalidValue = 0xA003;
+	InvalidOperation = 0xA004;
+)
 
+// GetError() returns the most recent error generated
+// in the AL state machine.
+func GetError() uint32 {
+	return uint32(C.alGetError());
+}
+
+// IsSource() returns true if id refers to a source.
+// Not very useful as we provide a distinct Source type.
+func IsSource(id uint32) bool {
+	return C.alIsSource(C.ALuint(id)) != 0;
+}
+
+// IsBuffer() returns true if id refers to a buffer.
+// Not very useful as we provide a distinct Buffer type.
+func IsBuffer(id uint32) bool {
+	return C.alIsBuffer(C.ALuint(id)) != 0;
+}
+
+// Renamed, was DopplerFactor.
+func SetDopplerFactor (value float32) {
+	C.alDopplerFactor(C.ALfloat(value));
+}
+
+// Renamed, was DopplerVelocity.
+func SetDopplerVelocity (value float32) {
+	C.alDopplerVelocity(C.ALfloat(value));
+}
+
+// Renamed, was SpeedOfSound.
+func SetSpeedOfSound (value float32) {
+	C.alSpeedOfSound(C.ALfloat(value));
+}
+
+// Distance models passed to SetDistanceModel().
+const (
+	InverseDistance = 0xD001;
+	InverseDistanceClamped = 0xD002;
+	LinearDistance = 0xD003;
+	LinearDistanceClamped = 0xD004;
+	ExponentDistance = 0xD005;
+	ExponentDistanceClamped = 0xD006;
+)
+
+// SetDistanceModel() changes the current distance model.
+// Renamed, was DistanceModel.
+func SetDistanceModel(model uint32) {
+	C.alDistanceModel(C.ALenum(model));
+}
 
 ///// Source /////////////////////////////////////////////////////////
 
 // Sources represent sound emitters in 3d space.
 type Source uint32;
 
+// GenSources() creates n sources.
 func GenSources(n int) (sources []Source) {
 	sources = make([]Source, n);
 	C.walGenSources(C.ALsizei(n), unsafe.Pointer(&sources[0]));
 	return;
 }
 
+// DeleteSources() deletes the given sources.
 func DeleteSources(sources []Source) {
 	n := len(sources);
 	C.walDeleteSources(C.ALsizei(n), unsafe.Pointer(&sources[0]));
 }
 
+// Renamed, was SourcePlayv.
+func PlaySources(sources []Source) {
+	C.walSourcePlayv(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
+}
+
+// Renamed, was SourceStopv.
+func StopSources(sources []Source) {
+	C.walSourceStopv(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
+}
+
+// Renamed, was SourceRewindv.
+func RewindSources(sources []Source) {
+	C.walSourceRewindv(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
+}
+
+// Renamed, was SourcePausev.
+func PauseSources(sources []Source) {
+	C.walSourcePausev(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
+}
+
+// Renamed, was Sourcef.
 func (self Source) Setf(param uint32, value float32) {
 	C.alSourcef(C.ALuint(self), C.ALenum(param), C.ALfloat(value));
 }
 
+// Renamed, was Source3f.
 func (self Source) Set3f(param uint32, value1, value2, value3 float32) {
 	C.alSource3f(C.ALuint(self), C.ALenum(param), C.ALfloat(value1), C.ALfloat(value2), C.ALfloat(value3));
 }
 
+// Renamed, was Sourcefv.
 func (self Source) Setfv(param uint32, values []float32) {
 	C.walSourcefv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
+// Renamed, was Sourcei.
 func (self Source) Seti(param uint32, value int32) {
 	C.alSourcei(C.ALuint(self), C.ALenum(param), C.ALint(value));
 }
 
+// Renamed, was Source3i.
 func (self Source) Set3i(param uint32, value1, value2, value3 int32) {
 	C.alSource3i(C.ALuint(self), C.ALenum(param), C.ALint(value1), C.ALint(value2), C.ALint(value3));
 }
 
+// Renamed, was Sourceiv.
 func (self Source) Setiv(param uint32, values []int32) {
 	C.walSourceiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
+// Renamed, was GetSourcef.
 func (self Source) Getf(param uint32) float32 {
 	return float32(C.walGetSourcef(C.ALuint(self), C.ALenum(param)));
 }
 
+// Renamed, was GetSource3f.
 func (self Source) Get3f(param uint32) (value1, value2, value3 float32) {
 	var v1, v2, v3 float32;
 	C.walGetSource3f(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
@@ -251,15 +281,18 @@ func (self Source) Get3f(param uint32) (value1, value2, value3 float32) {
 	return;
 }
 
+// Renamed, was GetSourcefv.
 func (self Source) Getfv(param uint32) (values []float32) {
 	C.walGetSourcefv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 	return;
 }
 
+// Renamed, was GetSourcei.
 func (self Source) Geti(param uint32) int32 {
 	return int32(C.walGetSourcei(C.ALuint(self), C.ALenum(param)));
 }
 
+// Renamed, was GetSource3i.
 func (self Source) Get3i(param uint32) (value1, value2, value3 int32) {
 	var v1, v2, v3 int32;
 	C.walGetSource3i(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
@@ -268,49 +301,42 @@ func (self Source) Get3i(param uint32) (value1, value2, value3 int32) {
 	return;
 }
 
+// Renamed, was GetSourceiv.
 func (self Source) Getiv(param uint32) (values []int32) {
 	C.walGetSourceiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 	return;
 }
 
+// Renamed, was SourcePlay.
 func (self Source) Play() {
 	C.alSourcePlay(C.ALuint(self));
 }
 
+// Renamed, was SourceStop.
 func (self Source) Stop() {
 	C.alSourceStop(C.ALuint(self));
 }
 
+// Renamed, was SourceRewind.
 func (self Source) Rewind() {
 	C.alSourceRewind(C.ALuint(self));
 }
 
+// Renamed, was SourcePause.
 func (self Source) Pause() {
 	C.alSourcePause(C.ALuint(self));
 }
 
+// TODO: write singulars of these two?
+
+// Renamed, was SourceQueueBuffers.
 func (self Source) QueueBuffers(buffers []Buffer) {
 	C.walSourceQueueBuffers(C.ALuint(self), C.ALsizei(len(buffers)), unsafe.Pointer(&buffers[0]));
 }
 
+// Renamed, was SourceUnqueueBuffers.
 func (self Source) UnqueueBuffers(buffers []Buffer) {
 	C.walSourceUnqueueBuffers(C.ALuint(self), C.ALsizei(len(buffers)), unsafe.Pointer(&buffers[0]));
-}
-
-func SourcePlayv(sources []Source) {
-	C.walSourcePlayv(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
-}
-
-func SourceStopv(sources []Source) {
-	C.walSourceStopv(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
-}
-
-func SourceRewindv(sources []Source) {
-	C.walSourceRewindv(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
-}
-
-func SourcePausev(sources []Source) {
-	C.walSourcePausev(C.ALsizei(len(sources)), unsafe.Pointer(&sources[0]));
 }
 
 ///// Buffer /////////////////////////////////////////////////////////
