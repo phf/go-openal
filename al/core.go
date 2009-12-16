@@ -81,10 +81,6 @@
 // source. In C, you'd say alSourcei(sid, AL_BUFFER, bid).
 // In Go, you could say sid.Seti(Buffer_, bid) if you
 // wish. But you probably want to say sid.SetBuffer(bid).
-//
-// TODO: write wrappers with better names around GetInteger()
-// and friends? for example GetDistanceModel()? could go into
-// util.go or something, pure Go code
 package al
 
 /*

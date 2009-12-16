@@ -5,7 +5,7 @@ include $(GOROOT)/src/Make.$(GOARCH)
 
 TARG=openal/al
 CGOFILES=core.go
-#GOFILES=error.go util.go
+GOFILES=util.go
 CGO_LDFLAGS=-lopenal
 CLEANFILES+=example
 
