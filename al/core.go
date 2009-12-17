@@ -155,29 +155,26 @@ const (
 )
 
 // TODO: Source properties.
-// TODO: al.h says that Pitch applies to Listener as
-// well as Source; however the OpenAL 1.1 specification
-// doesn't say that, it only mentions Pitch for Source;
-// we'll go with the spec for now
+// Regardless of what your al.h header may claim, Pitch
+// only applies to Sources, not to Listeners. And I got
+// that from Chris Robinson himself.
 const (
-	SourceRelative = 0x202;
-	ConeInnerAngle = 0x1001;
-	ConeOuterAngle = 0x1002;
-	Looping = 0x1007;
-	SecOffset = 0x1024;
-	SampleOffset = 0x1025;
-	ByteOffset = 0x1026;
-	ConeOuterGain = 0x1022;
-)
-const (
+	alSourceRelative = 0x202;
+	alConeInnerAngle = 0x1001;
+	alConeOuterAngle = 0x1002;
 	alPitch = 0x1003;
 	alDirection = 0x1005;
+	alLooping = 0x1007;
 	alBuffer = 0x1009;
 	alMinGain = 0x100D;
 	alMaxGain = 0x100E;
 	alReferenceDistance = 0x1020;
 	alRolloffFactor = 0x1021;
+	alConeOuterGain = 0x1022;
 	alMaxDistance = 0x1023;
+	alSecOffset = 0x1024;
+	alSampleOffset = 0x1025;
+	alByteOffset = 0x1026;
 )
 
 func GetString(param uint32) string {
@@ -307,42 +304,42 @@ func PauseSources(sources []Source) {
 }
 
 // Renamed, was Sourcef.
-func (self Source) Setf(param uint32, value float32) {
+func (self Source) setf(param uint32, value float32) {
 	C.alSourcef(C.ALuint(self), C.ALenum(param), C.ALfloat(value));
 }
 
 // Renamed, was Source3f.
-func (self Source) Set3f(param uint32, value1, value2, value3 float32) {
+func (self Source) set3f(param uint32, value1, value2, value3 float32) {
 	C.alSource3f(C.ALuint(self), C.ALenum(param), C.ALfloat(value1), C.ALfloat(value2), C.ALfloat(value3));
 }
 
 // Renamed, was Sourcefv.
-func (self Source) Setfv(param uint32, values []float32) {
+func (self Source) setfv(param uint32, values []float32) {
 	C.walSourcefv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was Sourcei.
-func (self Source) Seti(param uint32, value int32) {
+func (self Source) seti(param uint32, value int32) {
 	C.alSourcei(C.ALuint(self), C.ALenum(param), C.ALint(value));
 }
 
 // Renamed, was Source3i.
-func (self Source) Set3i(param uint32, value1, value2, value3 int32) {
+func (self Source) set3i(param uint32, value1, value2, value3 int32) {
 	C.alSource3i(C.ALuint(self), C.ALenum(param), C.ALint(value1), C.ALint(value2), C.ALint(value3));
 }
 
 // Renamed, was Sourceiv.
-func (self Source) Setiv(param uint32, values []int32) {
+func (self Source) setiv(param uint32, values []int32) {
 	C.walSourceiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was GetSourcef.
-func (self Source) Getf(param uint32) float32 {
+func (self Source) getf(param uint32) float32 {
 	return float32(C.walGetSourcef(C.ALuint(self), C.ALenum(param)));
 }
 
 // Renamed, was GetSource3f.
-func (self Source) Get3f(param uint32) (value1, value2, value3 float32) {
+func (self Source) get3f(param uint32) (value1, value2, value3 float32) {
 	var v1, v2, v3 float32;
 	C.walGetSource3f(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
 		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
@@ -351,17 +348,17 @@ func (self Source) Get3f(param uint32) (value1, value2, value3 float32) {
 }
 
 // Renamed, was GetSourcefv.
-func (self Source) Getfv(param uint32, values []float32) {
+func (self Source) getfv(param uint32, values []float32) {
 	C.walGetSourcefv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was GetSourcei.
-func (self Source) Geti(param uint32) int32 {
+func (self Source) geti(param uint32) int32 {
 	return int32(C.walGetSourcei(C.ALuint(self), C.ALenum(param)));
 }
 
 // Renamed, was GetSource3i.
-func (self Source) Get3i(param uint32) (value1, value2, value3 int32) {
+func (self Source) get3i(param uint32) (value1, value2, value3 int32) {
 	var v1, v2, v3 int32;
 	C.walGetSource3i(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
 		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
@@ -370,7 +367,7 @@ func (self Source) Get3i(param uint32) (value1, value2, value3 int32) {
 }
 
 // Renamed, was GetSourceiv.
-func (self Source) Getiv(param uint32, values []int32) {
+func (self Source) getiv(param uint32, values []int32) {
 	C.walGetSourceiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
@@ -664,7 +661,7 @@ func (self Source) UnqueueBuffer() Buffer {
 }
 
 // Source queries.
-// SourceType isn't documented as a query in the
+// TODO: SourceType isn't documented as a query in the
 // al.h header, but it is documented that way in
 // the OpenAL 1.1 specification.
 const (
@@ -676,140 +673,233 @@ const (
 
 // Convenience method, see Source.Geti().
 func (self Source) BuffersQueued() int32 {
-	return self.Geti(alBuffersQueued);
+	return self.geti(alBuffersQueued);
 }
 
 // Convenience method, see Source.Geti().
 func (self Source) BuffersProcessed() int32 {
-	return self.Geti(alBuffersProcessed);
+	return self.geti(alBuffersProcessed);
 }
 
 // Convenience method, see Source.Geti().
 func (self Source) State() int32 {
-	return self.Geti(alSourceState);
+	return self.geti(alSourceState);
 }
 
 // Convenience method, see Source.Geti().
 func (self Source) Type() int32 {
-	return self.Geti(alSourceType);
+	return self.geti(alSourceType);
 }
 
 // Convenience method, see Source.Getf().
 func (self Source) GetGain() (gain float32) {
-	return self.Getf(alGain);
+	return self.getf(alGain);
 }
 
 // Convenience method, see Source.Setf().
 func (self Source) SetGain(gain float32) {
-	self.Setf(alGain, gain);
+	self.setf(alGain, gain);
 }
 
 // Convenience method, see Source.Getf().
 func (self Source) GetMinGain() (gain float32) {
-	return self.Getf(alMinGain);
+	return self.getf(alMinGain);
 }
 
 // Convenience method, see Source.Setf().
 func (self Source) SetMinGain(gain float32) {
-	self.Setf(alMinGain, gain);
+	self.setf(alMinGain, gain);
 }
 
 // Convenience method, see Source.Getf().
 func (self Source) GetMaxGain() (gain float32) {
-	return self.Getf(alMaxGain);
+	return self.getf(alMaxGain);
 }
 
 // Convenience method, see Source.Setf().
 func (self Source) SetMaxGain(gain float32) {
-	self.Setf(alMaxGain, gain);
+	self.setf(alMaxGain, gain);
 }
 
 // Convenience method, see Source.Getf().
 func (self Source) GetReferenceDistance() (distance float32) {
-	return self.Getf(alReferenceDistance);
+	return self.getf(alReferenceDistance);
 }
 
 // Convenience method, see Source.Setf().
 func (self Source) SetReferenceDistance(distance float32) {
-	self.Setf(alReferenceDistance, distance);
+	self.setf(alReferenceDistance, distance);
 }
 
 // Convenience method, see Source.Getf().
 func (self Source) GetMaxDistance() (distance float32) {
-	return self.Getf(alMaxDistance);
+	return self.getf(alMaxDistance);
 }
 
 // Convenience method, see Source.Setf().
 func (self Source) SetMaxDistance(distance float32) {
-	self.Setf(alMaxDistance, distance);
+	self.setf(alMaxDistance, distance);
 }
 
 // Convenience method, see Source.Getf().
 func (self Source) GetPitch() (gain float32) {
-	return self.Getf(alPitch);
+	return self.getf(alPitch);
 }
 
 // Convenience method, see Source.Setf().
 func (self Source) SetPitch(gain float32) {
-	self.Setf(alPitch, gain);
+	self.setf(alPitch, gain);
 }
 
 // Convenience method, see Source.Getf().
 func (self Source) GetRolloffFactor() (gain float32) {
-	return self.Getf(alRolloffFactor);
+	return self.getf(alRolloffFactor);
 }
 
 // Convenience method, see Source.Setf().
 func (self Source) SetRolloffFactor(gain float32) {
-	self.Setf(alRolloffFactor, gain);
+	self.setf(alRolloffFactor, gain);
+}
+
+// Convenience method, see Source.Geti().
+func (self Source) GetLooping() bool {
+	return self.geti(alLooping) != alFalse;
+}
+
+// Convenience method, see Source.Seti().
+func (self Source) SetLooping(yes bool) {
+	v := map[bool]int32{true: alTrue, false: alFalse}[yes];
+	self.seti(alLooping, v);
+}
+
+// Convenience method, see Source.Geti().
+func (self Source) GetSourceRelative() bool {
+	return self.geti(alSourceRelative) != alFalse;
+}
+
+// Convenience method, see Source.Seti().
+func (self Source) SetSourceRelative(yes bool) {
+	v := map[bool]int32{true: alTrue, false: alFalse}[yes];
+	self.seti(alSourceRelative, v);
 }
 
 // Convenience method, see Source.Setfv().
 func (self Source) SetPosition(vector Vector) {
-	self.Setfv(alPosition, vector[0:]);
+	self.setfv(alPosition, vector[0:]);
 }
 
 // Convenience method, see Source.Getfv().
 func (self Source) GetPosition() Vector {
 	v := Vector{};
-	self.Getfv(alPosition, v[0:]);
+	self.getfv(alPosition, v[0:]);
 	return v;
 }
 
 // Convenience method, see Source.Setfv().
 func (self Source) SetDirection(vector Vector) {
-	self.Setfv(alDirection, vector[0:]);
+	self.setfv(alDirection, vector[0:]);
 }
 
 // Convenience method, see Source.Getfv().
 func (self Source) GetDirection() Vector {
 	v := Vector{};
-	self.Getfv(alDirection, v[0:]);
+	self.getfv(alDirection, v[0:]);
 	return v;
 }
 
 // Convenience method, see Source.Setfv().
 func (self Source) SetVelocity(vector Vector) {
-	self.Setfv(alVelocity, vector[0:]);
+	self.setfv(alVelocity, vector[0:]);
 }
 
 // Convenience method, see Source.Getfv().
 func (self Source) GetVelocity() Vector {
 	v := Vector{};
-	self.Getfv(alVelocity, v[0:]);
+	self.getfv(alVelocity, v[0:]);
 	return v;
 }
+
+
+
+
+// Convenience method, see Source.Getf().
+func (self Source) GetOffsetSeconds() float32 {
+	return self.getf(alSecOffset);
+}
+
+// Convenience method, see Source.Setf().
+func (self Source) SetOffsetSeconds(offset float32) {
+	self.setf(alSecOffset, offset);
+}
+
+// TODO: uint32?
+// Convenience method, see Source.Geti().
+func (self Source) GetOffsetSamples() int32 {
+	return self.geti(alSampleOffset);
+}
+
+// TODO: uint32?
+// Convenience method, see Source.Seti().
+func (self Source) SetOffsetSamples(offset int32) {
+	self.seti(alSampleOffset, offset);
+}
+
+// TODO: uint32?
+// Convenience method, see Source.Geti().
+func (self Source) GetOffsetBytes() int32 {
+	return self.geti(alByteOffset);
+}
+
+// TODO: uint32?
+// Convenience method, see Source.Seti().
+func (self Source) SetOffsetBytes(offset int32) {
+	self.seti(alByteOffset, offset);
+}
+
+// Convenience method, see Source.Getf().
+func (self Source) GetInnerAngle() float32 {
+	return self.getf(alConeInnerAngle);
+}
+
+// Convenience method, see Source.Setf().
+func (self Source) SetInnerAngle(offset float32) {
+	self.setf(alConeInnerAngle, offset);
+}
+
+// Convenience method, see Source.Getf().
+func (self Source) GetOuterAngle() float32 {
+	return self.getf(alConeOuterAngle);
+}
+
+// Convenience method, see Source.Setf().
+func (self Source) SetOuterAngle(offset float32) {
+	self.setf(alConeOuterAngle, offset);
+}
+
+// Convenience method, see Source.Getf().
+func (self Source) GetOuterGain() float32 {
+	return self.getf(alConeOuterGain);
+}
+
+// Convenience method, see Source.Setf().
+func (self Source) SetOuterGain(offset float32) {
+	self.setf(alConeOuterGain, offset);
+}
+
+
+
+
 
 // TODO: get rid of type cast by Buffer int32 instead of uint32
 // Convenience method, see Source.Geti().
 func (self Source) SetBuffer(buffer uint32) {
-	self.Seti(alBuffer, int32(buffer));
+	self.seti(alBuffer, int32(buffer));
 }
 
 // TODO: get rid of type cast by Buffer int32 instead of uint32
 // Convenience method, see Source.Geti().
 func (self Source) GetBuffer() (buffer uint32) {
-	return uint32(self.Geti(alBuffer));
+	return uint32(self.geti(alBuffer));
 }
 
 // Listener
