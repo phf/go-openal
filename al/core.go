@@ -410,8 +410,6 @@ func (self Source) Pause() {
 	C.alSourcePause(C.ALuint(self));
 }
 
-// TODO: write singulars of these two?
-
 // Renamed, was SourceQueueBuffers.
 func (self Source) QueueBuffers(buffers []Buffer) {
 	C.walSourceQueueBuffers(C.ALuint(self), C.ALsizei(len(buffers)), unsafe.Pointer(&buffers[0]));
@@ -664,6 +662,16 @@ func (self Buffer) GetChannels() uint32 {
 // Convenience method, see Buffer.Geti().
 func (self Buffer) GetSize() uint32 {
 	return uint32(self.Geti(Size));
+}
+
+// Convenience methods, see Source.QueueBuffers().
+func (self Source) QueueBuffer(buffer Buffer) {
+	C.walSourceQueueBuffer(C.ALuint(self), C.ALuint(buffer));
+}
+
+// Convenience methods, see Source.QueueBuffers().
+func (self Source) UnqueueBuffer() Buffer {
+	return Buffer(C.walSourceUnqueueBuffer(C.ALuint(self)));
 }
 
 ///// Crap ///////////////////////////////////////////////////////////
