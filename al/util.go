@@ -15,19 +15,9 @@ package al
 // Convenience type.
 type Vector [3]float32;
 
-// TODO: This is only needed because I decided to map
-// ALenum to uint32 instead of int32. Hmmm...
-func getEnum(param uint32) uint32 {
-	i := getInteger(param);
-	if i < 0 {
-		panic("GetEnum: value from GetInteger() < 0");
-	}
-	return uint32(i);
-}
-
 // Convenience function, see GetInteger().
-func GetDistanceModel() uint32 {
-	return getEnum(alDistanceModel);
+func GetDistanceModel() int32 {
+	return getInteger(alDistanceModel);
 }
 
 // Convenience function, see GetFloat().

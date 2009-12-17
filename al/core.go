@@ -19,8 +19,8 @@
 //	ALushort	uint16
 //	ALint		int32
 //	ALuint		uint32
-//	ALsizei		uint32	(although al.h suggests int32)
-//	ALenum		uint32	(although al.h suggests int32)
+//	ALsizei		int32	(although that's strange, it's what OpenAL wants)
+//	ALenum		int32	(although that's strange, it's what OpenAL wants)
 //	ALfloat		float32
 //	ALdouble	float64
 //	ALvoid		not applicable (but see below)
@@ -176,43 +176,43 @@ const (
 	alByteOffset = 0x1026;
 )
 
-func GetString(param uint32) string {
+func GetString(param int32) string {
 	return C.GoString(C.walGetString(C.ALenum(param)));
 }
 
-func getBoolean(param uint32) bool {
+func getBoolean(param int32) bool {
 	return C.alGetBoolean(C.ALenum(param)) != alFalse;
 }
 
-func getInteger(param uint32) int32 {
+func getInteger(param int32) int32 {
 	return int32(C.alGetInteger(C.ALenum(param)));
 }
 
-func getFloat(param uint32) float32 {
+func getFloat(param int32) float32 {
 	return float32(C.alGetFloat(C.ALenum(param)));
 }
 
-func getDouble(param uint32) float64 {
+func getDouble(param int32) float64 {
 	return float64(C.alGetDouble(C.ALenum(param)));
 }
 
 // Renamed, was GetBooleanv.
-func getBooleans(param uint32, data []bool) {
+func getBooleans(param int32, data []bool) {
 	C.walGetBooleanv(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
 // Renamed, was GetIntegerv.
-func getIntegers(param uint32, data []int32) {
+func getIntegers(param int32, data []int32) {
 	C.walGetIntegerv(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
 // Renamed, was GetFloatv.
-func getFloats(param uint32, data []float32) {
+func getFloats(param int32, data []float32) {
 	C.walGetFloatv(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
 // Renamed, was GetDoublev.
-func getDoubles(param uint32, data []float64) {
+func getDoubles(param int32, data []float64) {
 	C.walGetDoublev(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
@@ -259,7 +259,7 @@ const (
 // SetDistanceModel() changes the current distance model.
 // Pass "None" to disable distance attenuation.
 // Renamed, was DistanceModel.
-func SetDistanceModel(model uint32) {
+func SetDistanceModel(model int32) {
 	C.alDistanceModel(C.ALenum(model));
 }
 
@@ -303,42 +303,42 @@ func PauseSources(sources []Source) {
 }
 
 // Renamed, was Sourcef.
-func (self Source) setf(param uint32, value float32) {
+func (self Source) setf(param int32, value float32) {
 	C.alSourcef(C.ALuint(self), C.ALenum(param), C.ALfloat(value));
 }
 
 // Renamed, was Source3f.
-func (self Source) set3f(param uint32, value1, value2, value3 float32) {
+func (self Source) set3f(param int32, value1, value2, value3 float32) {
 	C.alSource3f(C.ALuint(self), C.ALenum(param), C.ALfloat(value1), C.ALfloat(value2), C.ALfloat(value3));
 }
 
 // Renamed, was Sourcefv.
-func (self Source) setfv(param uint32, values []float32) {
+func (self Source) setfv(param int32, values []float32) {
 	C.walSourcefv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was Sourcei.
-func (self Source) seti(param uint32, value int32) {
+func (self Source) seti(param int32, value int32) {
 	C.alSourcei(C.ALuint(self), C.ALenum(param), C.ALint(value));
 }
 
 // Renamed, was Source3i.
-func (self Source) set3i(param uint32, value1, value2, value3 int32) {
+func (self Source) set3i(param int32, value1, value2, value3 int32) {
 	C.alSource3i(C.ALuint(self), C.ALenum(param), C.ALint(value1), C.ALint(value2), C.ALint(value3));
 }
 
 // Renamed, was Sourceiv.
-func (self Source) setiv(param uint32, values []int32) {
+func (self Source) setiv(param int32, values []int32) {
 	C.walSourceiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was GetSourcef.
-func (self Source) getf(param uint32) float32 {
+func (self Source) getf(param int32) float32 {
 	return float32(C.walGetSourcef(C.ALuint(self), C.ALenum(param)));
 }
 
 // Renamed, was GetSource3f.
-func (self Source) get3f(param uint32) (value1, value2, value3 float32) {
+func (self Source) get3f(param int32) (value1, value2, value3 float32) {
 	var v1, v2, v3 float32;
 	C.walGetSource3f(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
 		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
@@ -347,17 +347,17 @@ func (self Source) get3f(param uint32) (value1, value2, value3 float32) {
 }
 
 // Renamed, was GetSourcefv.
-func (self Source) getfv(param uint32, values []float32) {
+func (self Source) getfv(param int32, values []float32) {
 	C.walGetSourcefv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was GetSourcei.
-func (self Source) geti(param uint32) int32 {
+func (self Source) geti(param int32) int32 {
 	return int32(C.walGetSourcei(C.ALuint(self), C.ALenum(param)));
 }
 
 // Renamed, was GetSource3i.
-func (self Source) get3i(param uint32) (value1, value2, value3 int32) {
+func (self Source) get3i(param int32) (value1, value2, value3 int32) {
 	var v1, v2, v3 int32;
 	C.walGetSource3i(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
 		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
@@ -366,7 +366,7 @@ func (self Source) get3i(param uint32) (value1, value2, value3 int32) {
 }
 
 // Renamed, was GetSourceiv.
-func (self Source) getiv(param uint32, values []int32) {
+func (self Source) getiv(param int32, values []int32) {
 	C.walGetSourceiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
@@ -429,42 +429,42 @@ func DeleteBuffers(buffers []Buffer) {
 }
 
 // Renamed, was Bufferf.
-func (self Buffer) setf(param uint32, value float32) {
+func (self Buffer) setf(param int32, value float32) {
 	C.alBufferf(C.ALuint(self), C.ALenum(param), C.ALfloat(value));
 }
 
 // Renamed, was Buffer3f.
-func (self Buffer) set3f(param uint32, value1, value2, value3 float32) {
+func (self Buffer) set3f(param int32, value1, value2, value3 float32) {
 	C.alBuffer3f(C.ALuint(self), C.ALenum(param), C.ALfloat(value1), C.ALfloat(value2), C.ALfloat(value3));
 }
 
 // Renamed, was Bufferfv.
-func (self Buffer) setfv(param uint32, values []float32) {
+func (self Buffer) setfv(param int32, values []float32) {
 	C.walBufferfv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was Bufferi.
-func (self Buffer) seti(param uint32, value int32) {
+func (self Buffer) seti(param int32, value int32) {
 	C.alBufferi(C.ALuint(self), C.ALenum(param), C.ALint(value));
 }
 
 // Renamed, was Buffer3i.
-func (self Buffer) set3i(param uint32, value1, value2, value3 int32) {
+func (self Buffer) set3i(param int32, value1, value2, value3 int32) {
 	C.alBuffer3i(C.ALuint(self), C.ALenum(param), C.ALint(value1), C.ALint(value2), C.ALint(value3));
 }
 
 // Renamed, was Bufferiv.
-func (self Buffer) setiv(param uint32, values []int32) {
+func (self Buffer) setiv(param int32, values []int32) {
 	C.walBufferiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was GetBufferf.
-func (self Buffer) getf(param uint32) float32 {
+func (self Buffer) getf(param int32) float32 {
 	return float32(C.walGetBufferf(C.ALuint(self), C.ALenum(param)));
 }
 
 // Renamed, was GetBuffer3f.
-func (self Buffer) get3f(param uint32) (value1, value2, value3 float32) {
+func (self Buffer) get3f(param int32) (value1, value2, value3 float32) {
 	var v1, v2, v3 float32;
 	C.walGetBuffer3f(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
 		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
@@ -473,18 +473,18 @@ func (self Buffer) get3f(param uint32) (value1, value2, value3 float32) {
 }
 
 // Renamed, was GetBufferfv.
-func (self Buffer) getfv(param uint32, values []float32) {
+func (self Buffer) getfv(param int32, values []float32) {
 	C.walGetBufferfv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 	return;
 }
 
 // Renamed, was GetBufferi.
-func (self Buffer) geti(param uint32) int32 {
+func (self Buffer) geti(param int32) int32 {
 	return int32(C.walGetBufferi(C.ALuint(self), C.ALenum(param)));
 }
 
 // Renamed, was GetBuffer3i.
-func (self Buffer) get3i(param uint32) (value1, value2, value3 int32) {
+func (self Buffer) get3i(param int32) (value1, value2, value3 int32) {
 	var v1, v2, v3 int32;
 	C.walGetBuffer3i(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
 		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
@@ -493,7 +493,7 @@ func (self Buffer) get3i(param uint32) (value1, value2, value3 int32) {
 }
 
 // Renamed, was GetBufferiv.
-func (self Buffer) getiv(param uint32, values []int32) {
+func (self Buffer) getiv(param int32, values []int32) {
 	C.walGetBufferiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
@@ -511,7 +511,7 @@ const (
 // must be a multiple of four bytes long. The frequency is given
 // in Hz.
 // Renamed, was BufferData.
-func (self Buffer) SetData(format uint32, data []byte, frequency uint32) {
+func (self Buffer) SetData(format int32, data []byte, frequency int32) {
 	C.alBufferData(C.ALuint(self), C.ALenum(format), unsafe.Pointer(&data[0]),
 		C.ALsizei(len(data)), C.ALsizei(frequency));
 }
@@ -529,42 +529,42 @@ func (self Buffer) SetData(format uint32, data []byte, frequency uint32) {
 type Listener struct{};
 
 // Renamed, was Listenerf.
-func (self Listener) setf(param uint32, value float32) {
+func (self Listener) setf(param int32, value float32) {
 	C.alListenerf(C.ALenum(param), C.ALfloat(value));
 }
 
 // Renamed, was Listener3f.
-func (self Listener) set3f(param uint32, value1, value2, value3 float32) {
+func (self Listener) set3f(param int32, value1, value2, value3 float32) {
 	C.alListener3f(C.ALenum(param), C.ALfloat(value1), C.ALfloat(value2), C.ALfloat(value3));
 }
 
 // Renamed, was Listenerfv.
-func (self Listener) setfv(param uint32, values []float32) {
+func (self Listener) setfv(param int32, values []float32) {
 	C.walListenerfv(C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was Listeneri.
-func (self Listener) seti(param uint32, value int32) {
+func (self Listener) seti(param int32, value int32) {
 	C.alListeneri(C.ALenum(param), C.ALint(value));
 }
 
 // Renamed, was Listener3i.
-func (self Listener) set3i(param uint32, value1, value2, value3 int32) {
+func (self Listener) set3i(param int32, value1, value2, value3 int32) {
 	C.alListener3i(C.ALenum(param), C.ALint(value1), C.ALint(value2), C.ALint(value3));
 }
 
 // Renamed, was Listeneriv.
-func (self Listener) setiv(param uint32, values []int32) {
+func (self Listener) setiv(param int32, values []int32) {
 	C.walListeneriv(C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was GetListenerf.
-func (self Listener) getf(param uint32) float32 {
+func (self Listener) getf(param int32) float32 {
 	return float32(C.walGetListenerf(C.ALenum(param)));
 }
 
 // Renamed, was GetListener3f.
-func (self Listener) get3f(param uint32) (value1, value2, value3 float32) {
+func (self Listener) get3f(param int32) (value1, value2, value3 float32) {
 	var v1, v2, v3 float32;
 	C.walGetListener3f(C.ALenum(param), unsafe.Pointer(&v1),
 		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
@@ -573,18 +573,18 @@ func (self Listener) get3f(param uint32) (value1, value2, value3 float32) {
 }
 
 // Renamed, was GetListenerfv.
-func (self Listener) getfv(param uint32, values []float32) {
+func (self Listener) getfv(param int32, values []float32) {
 	C.walGetListenerfv(C.ALenum(param), unsafe.Pointer(&values[0]));
 	return;
 }
 
 // Renamed, was GetListeneri.
-func (self Listener) geti(param uint32) int32 {
+func (self Listener) geti(param int32) int32 {
 	return int32(C.walGetListeneri(C.ALenum(param)));
 }
 
 // Renamed, was GetListener3i.
-func (self Listener) get3i(param uint32) (value1, value2, value3 int32) {
+func (self Listener) get3i(param int32) (value1, value2, value3 int32) {
 	var v1, v2, v3 int32;
 	C.walGetListener3i(C.ALenum(param), unsafe.Pointer(&v1),
 		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
@@ -593,7 +593,7 @@ func (self Listener) get3i(param uint32) (value1, value2, value3 int32) {
 }
 
 // Renamed, was GetListeneriv.
-func (self Listener) getiv(param uint32, values []int32) {
+func (self Listener) getiv(param int32, values []int32) {
 	C.walGetListeneriv(C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
@@ -956,15 +956,15 @@ func (self Listener) GetOrientation() (at Vector, up Vector) {
 // which is the latest specification. So we removed from from
 // the API for now, it's complicated enough without them.
 //
-//func Enable(capability uint32) {
+//func Enable(capability int32) {
 //	C.alEnable(C.ALenum(capability));
 //}
 //
-//func Disable(capability uint32) {
+//func Disable(capability int32) {
 //	C.alDisable(C.ALenum(capability));
 //}
 //
-//func IsEnabled(capability uint32) bool {
+//func IsEnabled(capability int32) bool {
 //	return C.alIsEnabled(C.ALenum(capability)) != alFalse;
 //}
 
