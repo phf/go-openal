@@ -765,10 +765,11 @@ func (self Source) GetLooping() bool {
 	return self.geti(alLooping) != alFalse;
 }
 
+var bool2al map[bool]int32 = map[bool]int32{true: alTrue, false: alFalse}
+
 // Convenience method, see Source.Seti().
 func (self Source) SetLooping(yes bool) {
-	v := map[bool]int32{true: alTrue, false: alFalse}[yes];
-	self.seti(alLooping, v);
+	self.seti(alLooping, bool2al[yes]);
 }
 
 // Convenience method, see Source.Geti().
@@ -778,8 +779,7 @@ func (self Source) GetSourceRelative() bool {
 
 // Convenience method, see Source.Seti().
 func (self Source) SetSourceRelative(yes bool) {
-	v := map[bool]int32{true: alTrue, false: alFalse}[yes];
-	self.seti(alSourceRelative, v);
+	self.seti(alSourceRelative, bool2al[yes]);
 }
 
 // Convenience method, see Source.Setfv().
