@@ -283,8 +283,9 @@ type Source uint32;
 // TODO: Attributes that can be set/queried with Buffer.*().
 // (Please use convenience methods instead.)
 
-// GenSources() creates n sources.
-func GenSources(n int) (sources []Source) {
+// NewSources() creates n sources.
+// Renamed, was GenSources.
+func NewSources(n int) (sources []Source) {
 	sources = make([]Source, n);
 	C.walGenSources(C.ALsizei(n), unsafe.Pointer(&sources[0]));
 	return;
@@ -428,8 +429,9 @@ const (
 	alSize = 0x2004;
 )
 
-// GenBuffers() creates n buffers.
-func GenBuffers(n int) (buffers []Buffer) {
+// NewBuffers() creates n buffers.
+// Renamed, was GenBuffers.
+func NewBuffers(n int) (buffers []Buffer) {
 	buffers = make([]Buffer, n);
 	C.walGenBuffers(C.ALsizei(n), unsafe.Pointer(&buffers[0]));
 	return;
@@ -614,9 +616,9 @@ func (self Listener) getiv(param uint32, values []int32) {
 
 // General
 
-// GenSource() creates a single source.
-// Convenience function, see GenSources().
-func GenSource() Source {
+// NewSource() creates a single source.
+// Convenience function, see NewSources().
+func NewSource() Source {
 	return Source(C.walGenSource());
 }
 
@@ -626,9 +628,9 @@ func DeleteSource(source Source) {
 	C.walDeleteSource(C.ALuint(source));
 }
 
-// GenBuffer() creates a single buffer.
-// Convenience function, see GenBuffers().
-func GenBuffer() Buffer {
+// NewBuffer() creates a single buffer.
+// Convenience function, see NewBuffers().
+func NewBuffer() Buffer {
 	return Buffer(C.walGenBuffer());
 }
 
