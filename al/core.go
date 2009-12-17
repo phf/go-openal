@@ -99,8 +99,10 @@ import "C"
 import "unsafe"
 
 // TODO: General constants for various purposes.
+// TODO: None is used to disable distance attenuation with SetDistanceModel().
+// TODO: None is used to clear a source of buffers with Source.SetBuffer().
 const (
-	None = 0; // TODO: no distance model, no buffer for source
+	None = 0;
 	alFalse = 0;
 	alTrue = 1;
 )
@@ -127,9 +129,9 @@ const (
 
 // TODO: Shared Source/Listener properties.
 const (
-	Position = 0x1004; // TODO: Source
-	Velocity = 0x1006; // TODO: Source
-	Gain = 0x100A; // TODO: Source
+	alPosition = 0x1004;
+	alVelocity = 0x1006;
+	alGain = 0x100A;
 )
 
 // TODO: Listener properties.
@@ -161,58 +163,60 @@ const (
 	SourceRelative = 0x202;
 	ConeInnerAngle = 0x1001;
 	ConeOuterAngle = 0x1002;
-	Pitch = 0x1003;
-	Direction = 0x1005;
 	Looping = 0x1007;
-	Buffer_ = 0x1009;
-	MinGain = 0x100D;
-	MaxGain = 0x100E;
 	SecOffset = 0x1024;
 	SampleOffset = 0x1025;
 	ByteOffset = 0x1026;
-	ReferenceDistance = 0x1020;
-	RolloffFactor = 0x1021;
 	ConeOuterGain = 0x1022;
-	MaxDistance = 0x1023;
+)
+const (
+	alPitch = 0x1003;
+	alDirection = 0x1005;
+	alBuffer = 0x1009;
+	alMinGain = 0x100D;
+	alMaxGain = 0x100E;
+	alReferenceDistance = 0x1020;
+	alRolloffFactor = 0x1021;
+	alMaxDistance = 0x1023;
 )
 
 func GetString(param uint32) string {
 	return C.GoString(C.walGetString(C.ALenum(param)));
 }
 
-func GetBoolean(param uint32) bool {
+func getBoolean(param uint32) bool {
 	return C.alGetBoolean(C.ALenum(param)) != alFalse;
 }
 
-func GetInteger(param uint32) int32 {
+func getInteger(param uint32) int32 {
 	return int32(C.alGetInteger(C.ALenum(param)));
 }
 
-func GetFloat(param uint32) float32 {
+func getFloat(param uint32) float32 {
 	return float32(C.alGetFloat(C.ALenum(param)));
 }
 
-func GetDouble(param uint32) float64 {
+func getDouble(param uint32) float64 {
 	return float64(C.alGetDouble(C.ALenum(param)));
 }
 
 // Renamed, was GetBooleanv.
-func GetBooleans(param uint32, data []bool) {
+func getBooleans(param uint32, data []bool) {
 	C.walGetBooleanv(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
 // Renamed, was GetIntegerv.
-func GetIntegers(param uint32, data []int32) {
+func getIntegers(param uint32, data []int32) {
 	C.walGetIntegerv(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
 // Renamed, was GetFloatv.
-func GetFloats(param uint32, data []float32) {
+func getFloats(param uint32, data []float32) {
 	C.walGetFloatv(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
 // Renamed, was GetDoublev.
-func GetDoubles(param uint32, data []float64) {
+func getDoubles(param uint32, data []float64) {
 	C.walGetDoublev(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
@@ -229,18 +233,6 @@ const (
 // in the AL state machine.
 func GetError() uint32 {
 	return uint32(C.alGetError());
-}
-
-// IsSource() returns true if id refers to a source.
-// Not very useful as we provide a distinct Source type.
-func IsSource(id uint32) bool {
-	return C.alIsSource(C.ALuint(id)) != alFalse;
-}
-
-// IsBuffer() returns true if id refers to a buffer.
-// Not very useful as we provide a distinct Buffer type.
-func IsBuffer(id uint32) bool {
-	return C.alIsBuffer(C.ALuint(id)) != alFalse;
 }
 
 // Renamed, was DopplerFactor.
@@ -702,39 +694,157 @@ func (self Source) Type() int32 {
 	return self.Geti(alSourceType);
 }
 
+// Convenience method, see Source.Getf().
+func (self Source) GetGain() (gain float32) {
+	return self.Getf(alGain);
+}
+
+// Convenience method, see Source.Setf().
+func (self Source) SetGain(gain float32) {
+	self.Setf(alGain, gain);
+}
+
+// Convenience method, see Source.Getf().
+func (self Source) GetMinGain() (gain float32) {
+	return self.Getf(alMinGain);
+}
+
+// Convenience method, see Source.Setf().
+func (self Source) SetMinGain(gain float32) {
+	self.Setf(alMinGain, gain);
+}
+
+// Convenience method, see Source.Getf().
+func (self Source) GetMaxGain() (gain float32) {
+	return self.Getf(alMaxGain);
+}
+
+// Convenience method, see Source.Setf().
+func (self Source) SetMaxGain(gain float32) {
+	self.Setf(alMaxGain, gain);
+}
+
+// Convenience method, see Source.Getf().
+func (self Source) GetReferenceDistance() (distance float32) {
+	return self.Getf(alReferenceDistance);
+}
+
+// Convenience method, see Source.Setf().
+func (self Source) SetReferenceDistance(distance float32) {
+	self.Setf(alReferenceDistance, distance);
+}
+
+// Convenience method, see Source.Getf().
+func (self Source) GetMaxDistance() (distance float32) {
+	return self.Getf(alMaxDistance);
+}
+
+// Convenience method, see Source.Setf().
+func (self Source) SetMaxDistance(distance float32) {
+	self.Setf(alMaxDistance, distance);
+}
+
+// Convenience method, see Source.Getf().
+func (self Source) GetPitch() (gain float32) {
+	return self.Getf(alPitch);
+}
+
+// Convenience method, see Source.Setf().
+func (self Source) SetPitch(gain float32) {
+	self.Setf(alPitch, gain);
+}
+
+// Convenience method, see Source.Getf().
+func (self Source) GetRolloffFactor() (gain float32) {
+	return self.Getf(alRolloffFactor);
+}
+
+// Convenience method, see Source.Setf().
+func (self Source) SetRolloffFactor(gain float32) {
+	self.Setf(alRolloffFactor, gain);
+}
+
+// Convenience method, see Source.Setfv().
+func (self Source) SetPosition(vector Vector) {
+	self.Setfv(alPosition, vector[0:]);
+}
+
+// Convenience method, see Source.Getfv().
+func (self Source) GetPosition() Vector {
+	v := Vector{};
+	self.Getfv(alPosition, v[0:]);
+	return v;
+}
+
+// Convenience method, see Source.Setfv().
+func (self Source) SetDirection(vector Vector) {
+	self.Setfv(alDirection, vector[0:]);
+}
+
+// Convenience method, see Source.Getfv().
+func (self Source) GetDirection() Vector {
+	v := Vector{};
+	self.Getfv(alDirection, v[0:]);
+	return v;
+}
+
+// Convenience method, see Source.Setfv().
+func (self Source) SetVelocity(vector Vector) {
+	self.Setfv(alVelocity, vector[0:]);
+}
+
+// Convenience method, see Source.Getfv().
+func (self Source) GetVelocity() Vector {
+	v := Vector{};
+	self.Getfv(alVelocity, v[0:]);
+	return v;
+}
+
+// TODO: get rid of type cast by Buffer int32 instead of uint32
+// Convenience method, see Source.Geti().
+func (self Source) SetBuffer(buffer uint32) {
+	self.Seti(alBuffer, int32(buffer));
+}
+
+// TODO: get rid of type cast by Buffer int32 instead of uint32
+// Convenience method, see Source.Geti().
+func (self Source) GetBuffer() (buffer uint32) {
+	return uint32(self.Geti(alBuffer));
+}
+
 // Listener
 
 // Convenience method, see Listener.Setf().
 func (self Listener) SetGain(gain float32) {
-	self.setf(Gain, gain);
+	self.setf(alGain, gain);
 }
 
 // Convenience method, see Listener.Getf().
 func (self Listener) GetGain() (gain float32) {
-	return self.getf(Gain);
+	return self.getf(alGain);
 }
 
 // Convenience method, see Listener.Setfv().
 func (self Listener) SetPosition(vector Vector) {
-	self.setfv(Position, vector[0:]);
+	self.setfv(alPosition, vector[0:]);
 }
 
 // Convenience method, see Listener.Getfv().
 func (self Listener) GetPosition() Vector {
 	v := Vector{};
-	self.getfv(Position, v[0:]);
+	self.getfv(alPosition, v[0:]);
 	return v;
 }
 
 // Convenience method, see Listener.Setfv().
 func (self Listener) SetVelocity(vector Vector) {
-	self.setfv(Velocity, vector[0:]);
+	self.setfv(alVelocity, vector[0:]);
 }
 
 // Convenience method, see Listener.Getfv().
 func (self Listener) GetVelocity() Vector {
 	v := Vector{};
-	self.getfv(Velocity, v[0:]);
+	self.getfv(alVelocity, v[0:]);
 	return v;
 }
 
@@ -785,3 +895,15 @@ func (self Listener) GetOrientation() (at Vector, up Vector) {
 //	Pending = 0x2011;
 //	Processed = 0x2012;
 //)
+
+// These functions would work fine, but they are not very
+// useful since we have distinct Source and Buffer types.
+// Leaving them out reduces API complexity, a good thing.
+//
+//func IsSource(id uint32) bool {
+//	return C.alIsSource(C.ALuint(id)) != alFalse;
+//}
+//
+//func IsBuffer(id uint32) bool {
+//	return C.alIsBuffer(C.ALuint(id)) != alFalse;
+//}

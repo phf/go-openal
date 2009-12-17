@@ -17,8 +17,8 @@ type Vector [3]float32;
 
 // TODO: This is only needed because I decided to map
 // ALenum to uint32 instead of int32. Hmmm...
-func GetEnum(param uint32) uint32 {
-	i := GetInteger(param);
+func getEnum(param uint32) uint32 {
+	i := getInteger(param);
 	if i < 0 {
 		panic("GetEnum: value from GetInteger() < 0");
 	}
@@ -27,22 +27,22 @@ func GetEnum(param uint32) uint32 {
 
 // Convenience function, see GetInteger().
 func GetDistanceModel() uint32 {
-	return GetEnum(alDistanceModel);
+	return getEnum(alDistanceModel);
 }
 
 // Convenience function, see GetFloat().
 func GetDopplerFactor() float32 {
-	return GetFloat(alDopplerFactor);
+	return getFloat(alDopplerFactor);
 }
 
 // Convenience function, see GetFloat().
 func GetDopplerVelocity() float32 {
-	return GetFloat(alDopplerVelocity);
+	return getFloat(alDopplerVelocity);
 }
 
 // Convenience function, see GetFloat().
 func GetSpeedOfSound() float32 {
-	return GetFloat(alSpeedOfSound);
+	return getFloat(alSpeedOfSound);
 }
 
 // Convenience function, see GetString().
