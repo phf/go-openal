@@ -15,8 +15,8 @@ func main() {
 	con.MakeContextCurrent();
 	fmt.Printf("%x\n", al.GetError());
 
-	src := al.GenSource();
-	src1 := al.GenSource();
+	src := al.NewSource();
+	src1 := al.NewSource();
 	fmt.Printf("%x\n", al.GetError());
 	fmt.Println(src);
 	fmt.Println(src1);
