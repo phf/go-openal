@@ -24,40 +24,40 @@ func GetEnum(param uint32) uint32 {
 
 // Convenience function, see GetInteger().
 func GetDistanceModel() uint32 {
-	return GetEnum(DistanceModel);
+	return GetEnum(alDistanceModel);
 }
 
 // Convenience function, see GetFloat().
 func GetDopplerFactor() float32 {
-	return GetFloat(DopplerFactor);
+	return GetFloat(alDopplerFactor);
 }
 
 // Convenience function, see GetFloat().
 func GetDopplerVelocity() float32 {
-	return GetFloat(DopplerVelocity);
+	return GetFloat(alDopplerVelocity);
 }
 
 // Convenience function, see GetFloat().
 func GetSpeedOfSound() float32 {
-	return GetFloat(SpeedOfSound);
+	return GetFloat(alSpeedOfSound);
 }
 
 // Convenience function, see GetString().
 func GetVendor() string {
-	return GetString(Vendor);
+	return GetString(alVendor);
 }
 
 // Convenience function, see GetString().
 func GetVersion() string {
-	return GetString(Version);
+	return GetString(alVersion);
 }
 
 // Convenience function, see GetString().
 func GetRenderer() string {
-	return GetString(Renderer);
+	return GetString(alRenderer);
 }
 
 // Convenience function, see GetString().
 func GetExtensions() string {
-	return GetString(Extensions);
+	return GetString(alExtensions);
 }

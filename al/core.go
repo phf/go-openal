@@ -107,22 +107,22 @@ const (
 
 // TODO: GetInteger() queries.
 const (
-	DistanceModel = 0xD000;
+	alDistanceModel = 0xD000;
 )
 
 // TODO: GetFloat() queries.
 const (
-	DopplerFactor = 0xC000;
-	DopplerVelocity = 0xC001;
-	SpeedOfSound = 0xC003;
+	alDopplerFactor = 0xC000;
+	alDopplerVelocity = 0xC001;
+	alSpeedOfSound = 0xC003;
 )
 
 // TODO: GetString() queries.
 const (
-	Vendor = 0xB001;
-	Version = 0xB002;
-	Renderer = 0xB003;
-	Extensions = 0xB004;
+	alVendor = 0xB001;
+	alVersion = 0xB002;
+	alRenderer = 0xB003;
+	alExtensions = 0xB004;
 )
 
 // TODO: Shared Source/Listener properties.
@@ -140,13 +140,13 @@ const (
 
 // TODO: Source queries.
 const (
-	SourceState = 0x1010;
-	BuffersQueued = 0x1015;
-	BuffersProcessed = 0x1016;
+	alSourceState = 0x1010;
+	alBuffersQueued = 0x1015;
+	alBuffersProcessed = 0x1016;
 	SourceType = 0x1027; // TODO: not documented as a query?
 )
 
-// Results from source state query.
+// Results from Source.State() query.
 const (
 	Initial = 0x1011;
 	Playing = 0x1012;
@@ -220,8 +220,7 @@ func GetDoubles(param uint32, data []float64) {
 	C.walGetDoublev(C.ALenum(param), unsafe.Pointer(&data[0]));
 }
 
-// Error codes returned by GetError().
-// Can be used with GetString().
+// Error codes from GetError()/for GetString().
 const (
 	NoError = alFalse;
 	InvalidName = 0xA001;
@@ -263,7 +262,7 @@ func SetSpeedOfSound (value float32) {
 	C.alSpeedOfSound(C.ALfloat(value));
 }
 
-// Distance models passed to SetDistanceModel().
+// Distance models for SetDistanceModel() and GetDistanceModel().
 const (
 	InverseDistance = 0xD001;
 	InverseDistanceClamped = 0xD002;
@@ -274,6 +273,7 @@ const (
 )
 
 // SetDistanceModel() changes the current distance model.
+// Pass "None" to disable distance attenuation.
 // Renamed, was DistanceModel.
 func SetDistanceModel(model uint32) {
 	C.alDistanceModel(C.ALenum(model));
@@ -428,10 +428,10 @@ type Buffer uint32;
 // Attributes that can be queried with Buffer.Geti().
 // (Please use convenience methods instead.)
 const (
-	Frequency = 0x2001;
-	Bits = 0x2002;
-	Channels = 0x2003;
-	Size = 0x2004;
+	alFrequency = 0x2001;
+	alBits = 0x2002;
+	alChannels = 0x2003;
+	alSize = 0x2004;
 )
 
 // GenBuffers() creates n buffers.
@@ -517,7 +517,7 @@ func (self Buffer) Getiv(param uint32) (values []int32) {
 	return;
 }
 
-// Format of sound samples passed to SetBufferData().
+// Format of sound samples passed to Buffer.SetData().
 const (
 	FormatMono8 = 0x1100;
 	FormatMono16 = 0x1101;
@@ -525,13 +525,13 @@ const (
 	FormatStereo16 = 0x1103;
 )
 
-// SetBufferData() specifies the sample data the buffer should use.
+// SetData() specifies the sample data the buffer should use.
 // For FormatMono16 and FormatStereo8 the data slice must be a
 // multiple of two bytes long; for FormatStereo16 the data slice
 // must be a multiple of four bytes long. The frequency is given
 // in Hz.
 // Renamed, was BufferData.
-func (self Buffer) SetBufferData(format uint32, data []byte, frequency uint32) {
+func (self Buffer) SetData(format uint32, data []byte, frequency uint32) {
 	C.alBufferData(C.ALuint(self), C.ALenum(format), unsafe.Pointer(&data[0]),
 		C.ALsizei(len(data)), C.ALsizei(frequency));
 }
@@ -620,6 +620,8 @@ func (self Listener) Getiv(param uint32) (values []int32) {
 
 ///// Convenience ////////////////////////////////////////////////////
 
+// General
+
 // GenSource() creates a single source.
 // Convenience function, see GenSources().
 func GenSource() Source {
@@ -644,34 +646,53 @@ func DeleteBuffer(buffer Buffer) {
 	C.walDeleteSource(C.ALuint(buffer));
 }
 
+// Buffer
+
 // Convenience method, see Buffer.Geti().
 func (self Buffer) GetFrequency() uint32 {
-	return uint32(self.Geti(Frequency));
+	return uint32(self.Geti(alFrequency));
 }
 
 // Convenience method, see Buffer.Geti().
 func (self Buffer) GetBits() uint32 {
-	return uint32(self.Geti(Bits));
+	return uint32(self.Geti(alBits));
 }
 
 // Convenience method, see Buffer.Geti().
 func (self Buffer) GetChannels() uint32 {
-	return uint32(self.Geti(Channels));
+	return uint32(self.Geti(alChannels));
 }
 
 // Convenience method, see Buffer.Geti().
 func (self Buffer) GetSize() uint32 {
-	return uint32(self.Geti(Size));
+	return uint32(self.Geti(alSize));
 }
 
-// Convenience methods, see Source.QueueBuffers().
+// Source
+
+// Convenience method, see Source.QueueBuffers().
 func (self Source) QueueBuffer(buffer Buffer) {
 	C.walSourceQueueBuffer(C.ALuint(self), C.ALuint(buffer));
 }
 
-// Convenience methods, see Source.QueueBuffers().
+// Convenience method, see Source.QueueBuffers().
 func (self Source) UnqueueBuffer() Buffer {
 	return Buffer(C.walSourceUnqueueBuffer(C.ALuint(self)));
+}
+
+// Convenience method, see Source.Geti().
+func (self Source) BuffersQueued() int32 {
+	return self.Geti(alBuffersQueued);
+}
+
+// Convenience method, see Source.Geti().
+func (self Source) BuffersProcessed() int32 {
+	return self.Geti(alBuffersProcessed);
+}
+
+// Convenience method, see Source.Geti().
+func (self Source) State() int32 {
+	return self.Geti(alSourceState);
 }
 
 ///// Crap ///////////////////////////////////////////////////////////
