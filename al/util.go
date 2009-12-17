@@ -12,6 +12,9 @@
 
 package al
 
+// Convenience type.
+type Vector [3]float32;
+
 // TODO: This is only needed because I decided to map
 // ALenum to uint32 instead of int32. Hmmm...
 func GetEnum(param uint32) uint32 {

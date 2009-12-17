@@ -127,23 +127,14 @@ const (
 
 // TODO: Shared Source/Listener properties.
 const (
-	Pitch = 0x1003; // TODO al.h says shared, docs say only Source?
-	Position = 0x1004;
-	Velocity = 0x1006;
-	Gain = 0x100A;
+	Position = 0x1004; // TODO: Source
+	Velocity = 0x1006; // TODO: Source
+	Gain = 0x100A; // TODO: Source
 )
 
 // TODO: Listener properties.
 const (
-	Orientation = 0x100F;
-)
-
-// TODO: Source queries.
-const (
-	alSourceState = 0x1010;
-	alBuffersQueued = 0x1015;
-	alBuffersProcessed = 0x1016;
-	SourceType = 0x1027; // TODO: not documented as a query?
+	alOrientation = 0x100F;
 )
 
 // Results from Source.State() query.
@@ -154,7 +145,7 @@ const (
 	Stopped = 0x1014;
 )
 
-// TODO: Presumably results from source type query?
+// Results from Source.Type() query.
 const (
 	Static = 0x1028;
 	Streaming = 0x1029;
@@ -162,10 +153,15 @@ const (
 )
 
 // TODO: Source properties.
+// TODO: al.h says that Pitch applies to Listener as
+// well as Source; however the OpenAL 1.1 specification
+// doesn't say that, it only mentions Pitch for Source;
+// we'll go with the spec for now
 const (
 	SourceRelative = 0x202;
 	ConeInnerAngle = 0x1001;
 	ConeOuterAngle = 0x1002;
+	Pitch = 0x1003;
 	Direction = 0x1005;
 	Looping = 0x1007;
 	Buffer_ = 0x1009;
@@ -365,9 +361,8 @@ func (self Source) Get3f(param uint32) (value1, value2, value3 float32) {
 }
 
 // Renamed, was GetSourcefv.
-func (self Source) Getfv(param uint32) (values []float32) {
+func (self Source) Getfv(param uint32, values []float32) {
 	C.walGetSourcefv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
-	return;
 }
 
 // Renamed, was GetSourcei.
@@ -385,9 +380,8 @@ func (self Source) Get3i(param uint32) (value1, value2, value3 int32) {
 }
 
 // Renamed, was GetSourceiv.
-func (self Source) Getiv(param uint32) (values []int32) {
+func (self Source) Getiv(param uint32, values []int32) {
 	C.walGetSourceiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
-	return;
 }
 
 // Renamed, was SourcePlay.
@@ -492,7 +486,7 @@ func (self Buffer) Get3f(param uint32) (value1, value2, value3 float32) {
 }
 
 // Renamed, was GetBufferfv.
-func (self Buffer) Getfv(param uint32) (values []float32) {
+func (self Buffer) Getfv(param uint32, values []float32) {
 	C.walGetBufferfv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 	return;
 }
@@ -512,9 +506,8 @@ func (self Buffer) Get3i(param uint32) (value1, value2, value3 int32) {
 }
 
 // Renamed, was GetBufferiv.
-func (self Buffer) Getiv(param uint32) (values []int32) {
+func (self Buffer) Getiv(param uint32, values []int32) {
 	C.walGetBufferiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
-	return;
 }
 
 // Format of sound samples passed to Buffer.SetData().
@@ -549,42 +542,42 @@ func (self Buffer) SetData(format uint32, data []byte, frequency uint32) {
 type Listener struct{};
 
 // Renamed, was Listenerf.
-func (self Listener) Setf(param uint32, value float32) {
+func (self Listener) setf(param uint32, value float32) {
 	C.alListenerf(C.ALenum(param), C.ALfloat(value));
 }
 
 // Renamed, was Listener3f.
-func (self Listener) Set3f(param uint32, value1, value2, value3 float32) {
+func (self Listener) set3f(param uint32, value1, value2, value3 float32) {
 	C.alListener3f(C.ALenum(param), C.ALfloat(value1), C.ALfloat(value2), C.ALfloat(value3));
 }
 
 // Renamed, was Listenerfv.
-func (self Listener) Setfv(param uint32, values []float32) {
+func (self Listener) setfv(param uint32, values []float32) {
 	C.walListenerfv(C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was Listeneri.
-func (self Listener) Seti(param uint32, value int32) {
+func (self Listener) seti(param uint32, value int32) {
 	C.alListeneri(C.ALenum(param), C.ALint(value));
 }
 
 // Renamed, was Listener3i.
-func (self Listener) Set3i(param uint32, value1, value2, value3 int32) {
+func (self Listener) set3i(param uint32, value1, value2, value3 int32) {
 	C.alListener3i(C.ALenum(param), C.ALint(value1), C.ALint(value2), C.ALint(value3));
 }
 
 // Renamed, was Listeneriv.
-func (self Listener) Setiv(param uint32, values []int32) {
+func (self Listener) setiv(param uint32, values []int32) {
 	C.walListeneriv(C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was GetListenerf.
-func (self Listener) Getf(param uint32) float32 {
+func (self Listener) getf(param uint32) float32 {
 	return float32(C.walGetListenerf(C.ALenum(param)));
 }
 
 // Renamed, was GetListener3f.
-func (self Listener) Get3f(param uint32) (value1, value2, value3 float32) {
+func (self Listener) get3f(param uint32) (value1, value2, value3 float32) {
 	var v1, v2, v3 float32;
 	C.walGetListener3f(C.ALenum(param), unsafe.Pointer(&v1),
 		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
@@ -593,18 +586,18 @@ func (self Listener) Get3f(param uint32) (value1, value2, value3 float32) {
 }
 
 // Renamed, was GetListenerfv.
-func (self Listener) Getfv(param uint32) (values []float32) {
+func (self Listener) getfv(param uint32, values []float32) {
 	C.walGetListenerfv(C.ALenum(param), unsafe.Pointer(&values[0]));
 	return;
 }
 
 // Renamed, was GetListeneri.
-func (self Listener) Geti(param uint32) int32 {
+func (self Listener) geti(param uint32) int32 {
 	return int32(C.walGetListeneri(C.ALenum(param)));
 }
 
 // Renamed, was GetListener3i.
-func (self Listener) Get3i(param uint32) (value1, value2, value3 int32) {
+func (self Listener) get3i(param uint32) (value1, value2, value3 int32) {
 	var v1, v2, v3 int32;
 	C.walGetListener3i(C.ALenum(param), unsafe.Pointer(&v1),
 		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
@@ -613,9 +606,8 @@ func (self Listener) Get3i(param uint32) (value1, value2, value3 int32) {
 }
 
 // Renamed, was GetListeneriv.
-func (self Listener) Getiv(param uint32) (values []int32) {
+func (self Listener) getiv(param uint32, values []int32) {
 	C.walGetListeneriv(C.ALenum(param), unsafe.Pointer(&values[0]));
-	return;
 }
 
 ///// Convenience ////////////////////////////////////////////////////
@@ -680,6 +672,17 @@ func (self Source) UnqueueBuffer() Buffer {
 	return Buffer(C.walSourceUnqueueBuffer(C.ALuint(self)));
 }
 
+// Source queries.
+// SourceType isn't documented as a query in the
+// al.h header, but it is documented that way in
+// the OpenAL 1.1 specification.
+const (
+	alSourceState = 0x1010;
+	alBuffersQueued = 0x1015;
+	alBuffersProcessed = 0x1016;
+	alSourceType = 0x1027;
+)
+
 // Convenience method, see Source.Geti().
 func (self Source) BuffersQueued() int32 {
 	return self.Geti(alBuffersQueued);
@@ -693,6 +696,66 @@ func (self Source) BuffersProcessed() int32 {
 // Convenience method, see Source.Geti().
 func (self Source) State() int32 {
 	return self.Geti(alSourceState);
+}
+
+// Convenience method, see Source.Geti().
+func (self Source) Type() int32 {
+	return self.Geti(alSourceType);
+}
+
+// Listener
+
+// Convenience method, see Listener.Setf().
+func (self Listener) SetGain(gain float32) {
+	self.setf(Gain, gain);
+}
+
+// Convenience method, see Listener.Getf().
+func (self Listener) GetGain() (gain float32) {
+	return self.getf(Gain);
+}
+
+// Convenience method, see Listener.Setfv().
+func (self Listener) SetPosition(vector Vector) {
+	self.setfv(Position, vector[0:]);
+}
+
+// Convenience method, see Listener.Getfv().
+func (self Listener) GetPosition() Vector {
+	v := Vector{};
+	self.getfv(Position, v[0:]);
+	return v;
+}
+
+// Convenience method, see Listener.Setfv().
+func (self Listener) SetVelocity(vector Vector) {
+	self.setfv(Velocity, vector[0:]);
+}
+
+// Convenience method, see Listener.Getfv().
+func (self Listener) GetVelocity() Vector {
+	v := Vector{};
+	self.getfv(Velocity, v[0:]);
+	return v;
+}
+
+// TODO: is there a better way to do this?
+// Convenience method, see Listener.Setfv().
+func (self Listener) SetOrientation(at Vector, up Vector) {
+	t := [6]float32{};
+	t[0] = at[0]; t[1] = at[1]; t[2] = at[2];
+	t[3] = up[0]; t[4] = up[1]; t[5] = up[2];
+	self.setfv(alOrientation, t[0:]);
+}
+
+// TODO: is there a better way to do this?
+// Convenience method, see Listener.Getfv().
+func (self Listener) GetOrientation() (at Vector, up Vector) {
+	t := [6]float32{};
+	self.getfv(alOrientation, t[0:]);
+	at[0] = t[0]; at[1] = t[1]; at[2] = t[2];
+	up[0] = t[3]; up[1] = t[4]; up[2] = t[5];
+	return;
 }
 
 ///// Crap ///////////////////////////////////////////////////////////
