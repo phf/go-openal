@@ -35,7 +35,7 @@
 // C-style arrays, we use Go slices if appropriate:
 //
 //	ALboolean*	[]bool
-//	ALvoid*		[]byte (see SetBufferData() for example)
+//	ALvoid*		[]byte (see Buffer.SetData() for example)
 //	ALint*		[]int32
 //	ALuint*		[]uint32 []Source []Buffer
 //	ALfloat*	[]float32
@@ -280,9 +280,6 @@ func SetDistanceModel(model uint32) {
 // Sources represent sound emitters in 3d space.
 type Source uint32;
 
-// TODO: Attributes that can be set/queried with Buffer.*().
-// (Please use convenience methods instead.)
-
 // NewSources() creates n sources.
 // Renamed, was GenSources.
 func NewSources(n int) (sources []Source) {
@@ -444,42 +441,42 @@ func DeleteBuffers(buffers []Buffer) {
 }
 
 // Renamed, was Bufferf.
-func (self Buffer) Setf(param uint32, value float32) {
+func (self Buffer) setf(param uint32, value float32) {
 	C.alBufferf(C.ALuint(self), C.ALenum(param), C.ALfloat(value));
 }
 
 // Renamed, was Buffer3f.
-func (self Buffer) Set3f(param uint32, value1, value2, value3 float32) {
+func (self Buffer) set3f(param uint32, value1, value2, value3 float32) {
 	C.alBuffer3f(C.ALuint(self), C.ALenum(param), C.ALfloat(value1), C.ALfloat(value2), C.ALfloat(value3));
 }
 
 // Renamed, was Bufferfv.
-func (self Buffer) Setfv(param uint32, values []float32) {
+func (self Buffer) setfv(param uint32, values []float32) {
 	C.walBufferfv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was Bufferi.
-func (self Buffer) Seti(param uint32, value int32) {
+func (self Buffer) seti(param uint32, value int32) {
 	C.alBufferi(C.ALuint(self), C.ALenum(param), C.ALint(value));
 }
 
 // Renamed, was Buffer3i.
-func (self Buffer) Set3i(param uint32, value1, value2, value3 int32) {
+func (self Buffer) set3i(param uint32, value1, value2, value3 int32) {
 	C.alBuffer3i(C.ALuint(self), C.ALenum(param), C.ALint(value1), C.ALint(value2), C.ALint(value3));
 }
 
 // Renamed, was Bufferiv.
-func (self Buffer) Setiv(param uint32, values []int32) {
+func (self Buffer) setiv(param uint32, values []int32) {
 	C.walBufferiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
 // Renamed, was GetBufferf.
-func (self Buffer) Getf(param uint32) float32 {
+func (self Buffer) getf(param uint32) float32 {
 	return float32(C.walGetBufferf(C.ALuint(self), C.ALenum(param)));
 }
 
 // Renamed, was GetBuffer3f.
-func (self Buffer) Get3f(param uint32) (value1, value2, value3 float32) {
+func (self Buffer) get3f(param uint32) (value1, value2, value3 float32) {
 	var v1, v2, v3 float32;
 	C.walGetBuffer3f(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
 		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
@@ -488,18 +485,18 @@ func (self Buffer) Get3f(param uint32) (value1, value2, value3 float32) {
 }
 
 // Renamed, was GetBufferfv.
-func (self Buffer) Getfv(param uint32, values []float32) {
+func (self Buffer) getfv(param uint32, values []float32) {
 	C.walGetBufferfv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 	return;
 }
 
 // Renamed, was GetBufferi.
-func (self Buffer) Geti(param uint32) int32 {
+func (self Buffer) geti(param uint32) int32 {
 	return int32(C.walGetBufferi(C.ALuint(self), C.ALenum(param)));
 }
 
 // Renamed, was GetBuffer3i.
-func (self Buffer) Get3i(param uint32) (value1, value2, value3 int32) {
+func (self Buffer) get3i(param uint32) (value1, value2, value3 int32) {
 	var v1, v2, v3 int32;
 	C.walGetBuffer3i(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&v1),
 		unsafe.Pointer(&v2), unsafe.Pointer(&v3));
@@ -508,7 +505,7 @@ func (self Buffer) Get3i(param uint32) (value1, value2, value3 int32) {
 }
 
 // Renamed, was GetBufferiv.
-func (self Buffer) Getiv(param uint32, values []int32) {
+func (self Buffer) getiv(param uint32, values []int32) {
 	C.walGetBufferiv(C.ALuint(self), C.ALenum(param), unsafe.Pointer(&values[0]));
 }
 
@@ -644,22 +641,22 @@ func DeleteBuffer(buffer Buffer) {
 
 // Convenience method, see Buffer.Geti().
 func (self Buffer) GetFrequency() uint32 {
-	return uint32(self.Geti(alFrequency));
+	return uint32(self.geti(alFrequency));
 }
 
 // Convenience method, see Buffer.Geti().
 func (self Buffer) GetBits() uint32 {
-	return uint32(self.Geti(alBits));
+	return uint32(self.geti(alBits));
 }
 
 // Convenience method, see Buffer.Geti().
 func (self Buffer) GetChannels() uint32 {
-	return uint32(self.Geti(alChannels));
+	return uint32(self.geti(alChannels));
 }
 
 // Convenience method, see Buffer.Geti().
 func (self Buffer) GetSize() uint32 {
-	return uint32(self.Geti(alSize));
+	return uint32(self.geti(alSize));
 }
 
 // Source
