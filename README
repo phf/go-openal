@@ -1,3 +1,20 @@
+Experimental OpenAL bindings for Go.
+====================================
+
+Everything is evolving quickly and nothing is totally done.
+If you want to see what the C-level API will look like I'd
+recommend reading openal/al and not much else.
+
+Even the C-level API *doesn't* follow the original API 100%
+and it's much cleaner as a result. If you are an old-timer,
+just relax and try to absorb it, you'll like it eventually.
+
+The top-level openal package is totally out of date, I only
+keep it around for reference while I refactor. Ignore it!
+
+Random Notes
+------------
+
 We can now play some sounds and theoretically we can also
 record something, but that's not tested yet. The code is
 a mess since I am still in the middle of learning OpenAL.
