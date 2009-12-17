@@ -828,25 +828,21 @@ func (self Source) SetOffsetSeconds(offset float32) {
 	self.setf(alSecOffset, offset);
 }
 
-// TODO: uint32?
 // Convenience method, see Source.Geti().
 func (self Source) GetOffsetSamples() int32 {
 	return self.geti(alSampleOffset);
 }
 
-// TODO: uint32?
 // Convenience method, see Source.Seti().
 func (self Source) SetOffsetSamples(offset int32) {
 	self.seti(alSampleOffset, offset);
 }
 
-// TODO: uint32?
 // Convenience method, see Source.Geti().
 func (self Source) GetOffsetBytes() int32 {
 	return self.geti(alByteOffset);
 }
 
-// TODO: uint32?
 // Convenience method, see Source.Seti().
 func (self Source) SetOffsetBytes(offset int32) {
 	self.seti(alByteOffset, offset);
