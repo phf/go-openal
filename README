@@ -15,6 +15,25 @@ way. I hope that this will allow hardcore hackers to go
 all the way to the bottom instead of being tied to what
 I think a Go-level API should look like. :-D
 
+I am finally done (well, sort of) wrapping OpenAL's "al"
+API in a way that I am pretty happy with. Some convenience
+functions/methods are missing, but all the functionality
+I can expose is now exposed. Remember that the API will
+change a little here and there as the remaining things
+are added. I decided that a 100% clone of the C API is
+just not good enough, even at a low level. But check it
+out for yourself. I think this rendition of OpenAL leads
+to much nicer code than the original C API while still
+staying close enough to be understandable for people with
+prior OpenAL experience.
+
+The plan now is to wrap the essential parts of "alc" and
+"alut" and then write some sensible demo application on
+top. I've wrapped all of "al" so people can see what the
+other ones will look like when they are done. But it's
+not really my priority to get them all the way done right
+now. Of course you're always welcome to help. :-D
+
 If you have any OpenAL experience, please help! Just email
 and we can get going. I have no OpenAL experience myself,
 so I need all the help I can get. :-D
