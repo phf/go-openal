@@ -82,12 +82,11 @@
 // In Go, you can say sid.Seti(Buffer_, bid) as well, but
 // you probably want to say sid.SetBuffer(bid) instead.
 //
-// TODO: Not all convenience functions/methods that should
-// exist are actually there yet. :-/
-//
-// TODO: After we have all the convenience functions/methods,
-// should we get rid of the generic stuff to unclutter the
-// API? Would take us further from OpenAL, but...
+// TODO: Decide on the final API design; the current state
+// has only specialized methods, none of the generic ones
+// anymore; it exposes everything (except stuff we can't
+// do) but I am not sure whether this is the right API for
+// the level we operate on. Not yet anyway. Anyone?
 package al
 
 /*
@@ -98,28 +97,28 @@ package al
 import "C"
 import "unsafe"
 
-// TODO: General constants for various purposes.
-// TODO: None is used to disable distance attenuation with SetDistanceModel().
-// TODO: None is used to clear a source of buffers with Source.SetBuffer().
+// General purpose constants. None can be used with SetDistanceModel()
+// to disable distance attenuation. None can be used with Source.SetBuffer()
+// to clear a Source of buffers.
 const (
 	None = 0;
 	alFalse = 0;
 	alTrue = 1;
 )
 
-// TODO: GetInteger() queries.
+// GetInteger() queries.
 const (
 	alDistanceModel = 0xD000;
 )
 
-// TODO: GetFloat() queries.
+// GetFloat() queries.
 const (
 	alDopplerFactor = 0xC000;
 	alDopplerVelocity = 0xC001;
 	alSpeedOfSound = 0xC003;
 )
 
-// TODO: GetString() queries.
+// GetString() queries.
 const (
 	alVendor = 0xB001;
 	alVersion = 0xB002;
@@ -127,14 +126,14 @@ const (
 	alExtensions = 0xB004;
 )
 
-// TODO: Shared Source/Listener properties.
+// Shared Source/Listener properties.
 const (
 	alPosition = 0x1004;
 	alVelocity = 0x1006;
 	alGain = 0x100A;
 )
 
-// TODO: Listener properties.
+// Listener properties.
 const (
 	alOrientation = 0x100F;
 )
@@ -819,9 +818,6 @@ func (self Source) GetVelocity() Vector {
 	return v;
 }
 
-
-
-
 // Convenience method, see Source.Getf().
 func (self Source) GetOffsetSeconds() float32 {
 	return self.getf(alSecOffset);
@@ -885,10 +881,6 @@ func (self Source) GetOuterGain() float32 {
 func (self Source) SetOuterGain(offset float32) {
 	self.setf(alConeOuterGain, offset);
 }
-
-
-
-
 
 // TODO: get rid of type cast by Buffer int32 instead of uint32
 // Convenience method, see Source.Geti().
