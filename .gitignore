@@ -3,4 +3,5 @@
 *.o
 *.so
 *.cgo?.*
+_cgo_*
 _obj
