@@ -878,16 +878,14 @@ func (self Source) SetOuterGain(offset float32) {
 	self.setf(alConeOuterGain, offset);
 }
 
-// TODO: get rid of type cast by Buffer int32 instead of uint32
 // Convenience method, see Source.Geti().
-func (self Source) SetBuffer(buffer uint32) {
+func (self Source) SetBuffer(buffer Buffer) {
 	self.seti(alBuffer, int32(buffer));
 }
 
-// TODO: get rid of type cast by Buffer int32 instead of uint32
 // Convenience method, see Source.Geti().
-func (self Source) GetBuffer() (buffer uint32) {
-	return uint32(self.geti(alBuffer));
+func (self Source) GetBuffer() (buffer Buffer) {
+	return Buffer(self.geti(alBuffer));
 }
 
 // Listener
