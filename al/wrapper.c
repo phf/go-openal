@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 #include <AL/al.h>
-#include "wrappers.h"
+#include "wrapper.h"
 
 const char *walGetString(ALenum param) {
 	return alGetString(param);

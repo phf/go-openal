@@ -92,7 +92,7 @@ package al
 /*
 #include <stdlib.h>
 #include <AL/al.h>
-#include "wrappers.h"
+#include "wrapper.h"
 */
 import "C"
 import "unsafe"
