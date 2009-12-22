@@ -20,9 +20,14 @@ ALCdevice *walcOpenDevice(const char *devicename) {
 }
 // ALCboolean alcCloseDevice( ALCdevice *device );
 // ALCenum alcGetError( ALCdevice *device );
-ALCboolean alcIsExtensionPresent( ALCdevice *device, const ALCchar *extname );
-void *alcGetProcAddress( ALCdevice *device, const ALCchar *funcname );
-ALCenum alcGetEnumValue( ALCdevice *device, const ALCchar *enumname );
+
+// We don't define wrappers for these, see openal/al
+// for details.
+//
+// ALCboolean alcIsExtensionPresent( ALCdevice *device, const ALCchar *extname );
+// void *alcGetProcAddress( ALCdevice *device, const ALCchar *funcname );
+// ALCenum alcGetEnumValue( ALCdevice *device, const ALCchar *enumname );
+
 const ALCchar *alcGetString( ALCdevice *device, ALCenum param );
 //void alcGetIntegerv( ALCdevice *device, ALCenum param, ALCsizei size, ALCint *data );
 void walcGetIntegerv(ALCdevice *device, ALCenum param, ALCsizei size, void *data) {
@@ -40,7 +45,7 @@ ALCdevice *walcCaptureOpenDevice(const char *devicename, ALCuint frequency, ALCe
 // For convenience we offer "singular" versions of the following
 // calls as well, which require different wrappers if we want to
 // be efficient. The main reason for "singular" versions is that
-// Go doesn't allow us to treat a variable as an array.
+// Go doesn't allow us to treat a variable as an array of size 1.
 
 ALCint walcGetInteger(ALCdevice *device, ALCenum param) {
 	ALCint result;
