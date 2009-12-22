@@ -15,4 +15,4 @@ include $(GOROOT)/src/Make.pkg
 _cgo_.so: wrapper.o
 
 wrapper.o: wrapper.c
-	gcc -fPIC -O2 -o $@ -c $^
+	gcc $(_CGO_CFLAGS_$(GOARCH)) -fPIC -O2 -o $@ -c $^
