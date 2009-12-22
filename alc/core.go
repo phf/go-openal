@@ -28,6 +28,11 @@ import "unsafe"
 
 import "openal/al"
 
+const (
+	alcFalse = 0;
+	alcTrue = 1;
+)
+
 // Error codes returned by Device.GetError().
 const (
 	NoError = 0;
@@ -156,18 +161,47 @@ func (self *CaptureDevice) CaptureSamples(size uint32) (data []byte) {
 	return;
 }
 
+///// Context ///////////////////////////////////////////////////////
 
-
+// Context encapsulates the state of a given instance
+// of the OpenAL state machine. Only one context can
+// be active in a given process.
 type Context struct {
-	handle *C.ALCcontext;
+	handle *C.ALCcontext
 }
 
-func (self *Context) MakeContextCurrent() bool {
-	return C.alcMakeContextCurrent(self.handle) != 0;
+// A context that doesn't exist, useful for certain
+// context operations (see OpenAL documentation for
+// details).
+var NullContext Context
+
+// Renamed, was MakeContextCurrent.
+func (self *Context) Activate() bool {
+	return C.alcMakeContextCurrent(self.handle) != alcFalse
 }
 
-func (self *Context) DestroyContext() {
-	C.alcDestroyContext(self.handle);
-	self.handle = nil;
+// Renamed, was ProcessContext.
+func (self *Context) Process() {
+	C.alcProcessContext(self.handle)
 }
 
+// Renamed, was SuspendContext.
+func (self *Context) Suspend() {
+	C.alcSuspendContext(self.handle)
+}
+
+// Renamed, was DestroyContext.
+func (self *Context) Destroy() {
+	C.alcDestroyContext(self.handle)
+	self.handle = nil
+}
+
+// Renamed, was GetContextsDevice.
+func (self *Context) GetDevice() *Device {
+	return &Device{C.alcGetContextsDevice(self.handle)}
+}
+
+// Renamed, was GetCurrentContext.
+func CurrentContext() *Context {
+	return &Context{C.alcGetCurrentContext()}
+}

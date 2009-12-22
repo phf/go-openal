@@ -7,14 +7,14 @@
 // They'll go away eventually. Those commented out are already
 // accessible from Go.
 
-ALCcontext *alcCreateContext( ALCdevice *device, const ALCint* attrlist );
-ALCboolean alcMakeContextCurrent( ALCcontext *context );
-void alcProcessContext( ALCcontext *context );
-void alcSuspendContext( ALCcontext *context );
-void alcDestroyContext( ALCcontext *context );
-ALCcontext *alcGetCurrentContext( void );
-ALCdevice *alcGetContextsDevice( ALCcontext *context );
-// ALCdevice *alcOpenDevice( const ALCchar *devicename );
+//ALCcontext *alcCreateContext( ALCdevice *device, const ALCint* attrlist );
+//ALCboolean alcMakeContextCurrent( ALCcontext *context );
+//void alcProcessContext( ALCcontext *context );
+//void alcSuspendContext( ALCcontext *context );
+//void alcDestroyContext( ALCcontext *context );
+//ALCcontext *alcGetCurrentContext( void );
+//ALCdevice *alcGetContextsDevice( ALCcontext *context );
+//ALCdevice *alcOpenDevice( const ALCchar *devicename );
 ALCdevice *walcOpenDevice(const char *devicename) {
 	return alcOpenDevice(devicename);
 }
