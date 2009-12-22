@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// It's sad but the OpenAL C API uses lots and lots of typedefs
-// that require wrapper functions (using basic C types) for cgo
-// to grok them. So there's a lot more C code here than I would
-// like...
+#include <AL/al.h>
+#include "wrappers.h"
 
 const char *walGetString(ALenum param) {
 	return alGetString(param);
@@ -26,18 +24,6 @@ void walGetFloatv(ALenum param, void* data) {
 void walGetDoublev(ALenum param, void* data) {
 	alGetDoublev(param, data);
 }
-
-// We don't define wrappers for these because we have
-// no clue how to make Go grok C function pointers at
-// runtime. So for now, OpenAL extensions can not be
-// used from Go. If you have an idea for how to make
-// it work, be sure to email! I suspect we'd need a
-// mechanism for generating cgo-style stubs at runtime,
-// sounds like work.
-//
-// ALboolean alIsExtensionPresent( const ALchar* extname );
-// void* alGetProcAddress( const ALchar* fname );
-// ALenum alGetEnumValue( const ALchar* ename );
 
 // Listeners
 
@@ -193,10 +179,7 @@ void walGetBufferiv(ALuint bid, ALenum param, void* values) {
 	alGetBufferiv(bid, param, values);
 }
 
-// For convenience we offer "singular" versions of the following
-// calls as well, which require different wrappers if we want to
-// be efficient. The main reason for "singular" versions is that
-// Go doesn't allow us to treat a variable as an array of size 1.
+// Singulars
 
 ALuint walGenSource(void) {
 	ALuint source;

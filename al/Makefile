@@ -6,11 +6,13 @@ include $(GOROOT)/src/Make.$(GOARCH)
 TARG=openal/al
 CGOFILES=core.go
 GOFILES=util.go
-CGO_LDFLAGS=-lopenal
-#CLEANFILES+=example
+CGO_LDFLAGS=wrappers.o -lopenal
+CLEANFILES+=wrappers.o
 
 include $(GOROOT)/src/Make.pkg
 
-#example: install example.go
-#	$(GC) example.go
-#	$(LD) -o $@ example.$O
+# cute hack to trigger wrappers.o on make install
+_cgo_.so: wrappers.o
+
+wrappers.o: wrappers.c
+	gcc -fPIC -O2 -o $@ -c $^
