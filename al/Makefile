@@ -4,7 +4,7 @@
 include $(GOROOT)/src/Make.$(GOARCH)
 
 TARG=openal/al
-CGOFILES=core.go buffer.go
+CGOFILES=core.go buffer.go listener.go
 GOFILES=util.go
 CGO_LDFLAGS=wrapper.o -lopenal
 CLEANFILES+=wrapper.o
