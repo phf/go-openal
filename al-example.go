@@ -11,7 +11,7 @@ func main() {
 	fmt.Printf("%x\n", out.GetError())
 	con := out.CreateContext()
 	fmt.Printf("%x\n", out.GetError())
-	con.MakeContextCurrent()
+	con.Activate()
 	fmt.Printf("%x\n", out.GetError())
 
 	in := alc.CaptureOpenDevice("", 8000, al.FormatMono16, 16000)
