@@ -159,4 +159,3 @@ func (self Buffer) GetChannels() uint32 {
 func (self Buffer) GetSize() uint32 {
 	return uint32(self.geti(alSize));
 }
-
