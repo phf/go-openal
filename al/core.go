@@ -2,9 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// C-level binding for OpenAL's "al" API.
+// Go binding for OpenAL's "al" API.
 //
-// Please consider using the Go-level binding instead.
 // See http://connect.creativelabs.com/openal/Documentation/OpenAL%201.1%20Specification.htm
 // for details about OpenAL not described here.
 //

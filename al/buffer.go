@@ -16,7 +16,6 @@ import "unsafe"
 type Buffer uint32;
 
 // Attributes that can be queried with Buffer.Geti().
-// (Please use convenience methods instead.)
 const (
 	alFrequency = 0x2001;
 	alBits = 0x2002;
@@ -24,7 +23,7 @@ const (
 	alSize = 0x2004;
 )
 
-// NewBuffers() creates n buffers.
+// NewBuffers() creates n fresh buffers.
 // Renamed, was GenBuffers.
 func NewBuffers(n int) (buffers []Buffer) {
 	buffers = make([]Buffer, n);
@@ -126,8 +125,6 @@ func (self Buffer) SetData(format int32, data []byte, frequency int32) {
 		C.ALsizei(len(data)), C.ALsizei(frequency));
 }
 
-///// Convenience ////////////////////////////////////////////////////
-
 // NewBuffer() creates a single buffer.
 // Convenience function, see NewBuffers().
 func NewBuffer() Buffer {
@@ -140,22 +137,26 @@ func DeleteBuffer(buffer Buffer) {
 	C.walDeleteSource(C.ALuint(buffer));
 }
 
-// Convenience method, see Buffer.Geti().
+// GetFrequency() returns the frequency, in Hz, of the buffer's sample data.
+// Convenience method.
 func (self Buffer) GetFrequency() uint32 {
 	return uint32(self.geti(alFrequency));
 }
 
-// Convenience method, see Buffer.Geti().
+// GetBits() returns the resolution, either 8 or 16 bits, of the buffer's sample data.
+// Convenience method.
 func (self Buffer) GetBits() uint32 {
 	return uint32(self.geti(alBits));
 }
 
-// Convenience method, see Buffer.Geti().
+// GetChannels() returns the number of channels, either 1 or 2, of the buffer's sample data.
+// Convenience method.
 func (self Buffer) GetChannels() uint32 {
 	return uint32(self.geti(alChannels));
 }
 
-// Convenience method, see Buffer.Geti().
+// GetSize() returns the size, in bytes, of the buffer's sample data.
+// Convenience method.
 func (self Buffer) GetSize() uint32 {
 	return uint32(self.geti(alSize));
 }
